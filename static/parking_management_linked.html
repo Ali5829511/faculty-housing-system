@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المواقف المربوطة - إسكان أعضاء هيئة التدريس</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .logo {
+            width: 50px;
+            height: 50px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .back-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .occupied { color: #e74c3c; }
+        .available { color: #27ae60; }
+        .reserved { color: #f39c12; }
+        .special { color: #3498db; }
+
+        .chart-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 1rem;
+        }
+
+        .controls-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .table-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #34495e;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-occupied {
+            background: #fee;
+            color: #e74c3c;
+        }
+
+        .status-available {
+            background: #efe;
+            color: #27ae60;
+        }
+
+        .status-reserved {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+
+        .status-maintenance {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .resident-info {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <div class="logo">
+                <i class="fas fa-parking"></i>
+            </div>
+            إدارة المواقف المربوطة
+            <small style="font-size: 0.7rem; color: #666;">نظام إدارة المواقف وشكاوى وتعهدات السكان</small>
+        </h1>
+        <a href="dashboard.html" class="back-btn">
+            <i class="fas fa-arrow-right"></i>
+            العودة لوحة التحكم
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- إحصائيات المواقف -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon occupied">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-number occupied" id="occupiedCount">-</div>
+                <div class="stat-label">المواقف المشغولة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon available">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number available" id="availableCount">-</div>
+                <div class="stat-label">المواقف المتاحة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon reserved">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+                <div class="stat-number reserved" id="reservedCount">-</div>
+                <div class="stat-label">المواقف المحجوزة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon special">
+                    <i class="fas fa-wheelchair"></i>
+                </div>
+                <div class="stat-number special" id="specialCount">-</div>
+                <div class="stat-label">مواقف ذوي الاحتياجات الخاصة</div>
+            </div>
+        </div>
+
+        <!-- الرسم البياني -->
+        <div class="chart-section">
+            <h3><i class="fas fa-chart-pie"></i> توزيع المواقف حسب الحالة</h3>
+            <div class="chart-container">
+                <canvas id="parkingChart"></canvas>
+            </div>
+        </div>
+
+        <!-- أدوات التحكم والبحث -->
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label for="searchInput">البحث</label>
+                    <input type="text" id="searchInput" placeholder="البحث برقم الموقف أو اسم الساكن أو المبنى...">
+                </div>
+                <div class="form-group">
+                    <label for="statusFilter">تصفية حسب الحالة</label>
+                    <select id="statusFilter">
+                        <option value="">جميع الحالات</option>
+                        <option value="مشغول">مشغول</option>
+                        <option value="متاح">متاح</option>
+                        <option value="محجوز">محجوز</option>
+                        <option value="صيانة">صيانة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="buildingFilter">تصفية حسب المبنى</label>
+                    <select id="buildingFilter">
+                        <option value="">جميع المباني</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-search"></i>
+                        تطبيق التصفية
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-success" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i>
+                        تصدير Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- جدول المواقف -->
+        <div class="table-section">
+            <div class="table-header">
+                <h3><i class="fas fa-list"></i> قائمة المواقف المربوطة</h3>
+                <span id="totalCount">إجمالي: 0 موقف</span>
+            </div>
+            <div class="table-container">
+                <table id="parkingTable">
+                    <thead>
+                        <tr>
+                            <th>رقم الموقف</th>
+                            <th>المبنى</th>
+                            <th>الشقة</th>
+                            <th>اسم الساكن</th>
+                            <th>حالة الشقة</th>
+                            <th>حالة الموقف</th>
+                            <th>مربع الوقوف</th>
+                            <th>وصف المبنى</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parkingTableBody">
+                        <tr>
+                            <td colspan="8" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination">
+                <!-- سيتم إنشاء أزرار الترقيم هنا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- نظام الربط الشامل -->
+  <script src="system_integration.js"></script>
+  <!-- ودجت المراجع المتقاطعة -->
+  <script src="cross_reference_widget.js"></script>
+  <link rel="stylesheet" href="integration_styles.css">
+  
+  <script>
+        let allParkingData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 50;
+        let chart = null;
+
+        // تحميل البيانات
+        async function loadParkingData() {
+            try {
+                const response = await fetch('linked_parking_data.json');
+                if (!response.ok) {
+                    throw new Error('فشل في تحميل البيانات');
+                }
+                allParkingData = await response.json();
+                filteredData = [...allParkingData];
+                
+                updateStatistics();
+                updateChart();
+                populateBuildingFilter();
+                displayTable();
+                
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                document.getElementById('parkingTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            خطأ في تحميل البيانات: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // تحديث الإحصائيات
+        function updateStatistics() {
+            const stats = {
+                occupied: 0,
+                available: 0,
+                reserved: 0,
+                special: 0
+            };
+
+            allParkingData.forEach(parking => {
+                const status = parking.حالة_الموقف || parking.الحالة || 'متاح';
+                const isSpecial = (parking.الحالة || '').includes('احتياجات خاصة');
+                
+                if (isSpecial) {
+                    stats.special++;
+                }
+                
+                switch (status) {
+                    case 'مشغول':
+                        stats.occupied++;
+                        break;
+                    case 'متاح':
+                        stats.available++;
+                        break;
+                    case 'محجوز':
+                        stats.reserved++;
+                        break;
+                }
+            });
+
+            document.getElementById('occupiedCount').textContent = stats.occupied.toLocaleString();
+            document.getElementById('availableCount').textContent = stats.available.toLocaleString();
+            document.getElementById('reservedCount').textContent = stats.reserved.toLocaleString();
+            document.getElementById('specialCount').textContent = stats.special.toLocaleString();
+        }
+
+        // تحديث الرسم البياني
+        function updateChart() {
+            const ctx = document.getElementById('parkingChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            const stats = {
+                occupied: allParkingData.filter(p => (p.حالة_الموقف || p.الحالة || 'متاح') === 'مشغول').length,
+                available: allParkingData.filter(p => (p.حالة_الموقف || p.الحالة || 'متاح') === 'متاح').length,
+                reserved: allParkingData.filter(p => (p.حالة_الموقف || p.الحالة || 'متاح') === 'محجوز').length
+            };
+
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['مشغول', 'متاح', 'محجوز'],
+                    datasets: [{
+                        data: [stats.occupied, stats.available, stats.reserved],
+                        backgroundColor: ['#e74c3c', '#27ae60', '#f39c12'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ملء قائمة المباني
+        function populateBuildingFilter() {
+            const buildings = [...new Set(allParkingData.map(p => p.المبنى).filter(b => b))].sort((a, b) => a - b);
+            const buildingFilter = document.getElementById('buildingFilter');
+            
+            buildings.forEach(building => {
+                const option = document.createElement('option');
+                option.value = building;
+                option.textContent = `مبنى ${building}`;
+                buildingFilter.appendChild(option);
+            });
+        }
+
+        // تطبيق التصفية
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const buildingFilter = document.getElementById('buildingFilter').value;
+
+            filteredData = allParkingData.filter(parking => {
+                const matchesSearch = !searchTerm || 
+                    (parking['رقم الموقف'] || '').toString().toLowerCase().includes(searchTerm) ||
+                    (parking.اسم_الساكن || '').toLowerCase().includes(searchTerm) ||
+                    (parking.المبنى || '').toString().toLowerCase().includes(searchTerm) ||
+                    (parking.الشقة || '').toString().toLowerCase().includes(searchTerm);
+
+                const matchesStatus = !statusFilter || 
+                    (parking.حالة_الموقف || parking.الحالة || 'متاح') === statusFilter;
+
+                const matchesBuilding = !buildingFilter || 
+                    (parking.المبنى || '').toString() === buildingFilter;
+
+                return matchesSearch && matchesStatus && matchesBuilding;
+            });
+
+            currentPage = 1;
+            displayTable();
+        }
+
+        // عرض الجدول
+        function displayTable() {
+            const tbody = document.getElementById('parkingTableBody');
+            const totalCount = document.getElementById('totalCount');
+            
+            totalCount.textContent = `إجمالي: ${filteredData.length.toLocaleString()} موقف`;
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-search"></i>
+                            لا توجد مواقف تطابق معايير البحث
+                        </td>
+                    </tr>
+                `;
+                updatePagination();
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            tbody.innerHTML = pageData.map(parking => {
+                const status = parking.حالة_الموقف || parking.الحالة || 'متاح';
+                const statusClass = getStatusClass(status);
+                const statusIcon = getStatusIcon(status);
+                
+                return `
+                    <tr>
+                        <td><strong>${parking['رقم الموقف'] || '-'}</strong></td>
+                        <td>${parking.المبنى || '-'}</td>
+                        <td>${parking.الشقة || '-'}</td>
+                        <td class="resident-info" title="${parking.اسم_الساكن || 'غير محدد'}">
+                            ${parking.اسم_الساكن || '<em>غير محدد</em>'}
+                        </td>
+                        <td>${parking.حالة_الشقة || 'غير محدد'}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                <i class="${statusIcon}"></i>
+                                ${status}
+                            </span>
+                        </td>
+                        <td>${parking['مربع الوقوف'] || '-'}</td>
+                        <td>${parking.وصف_المبنى || 'غير محدد'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            updatePagination();
+        }
+
+        // الحصول على فئة CSS للحالة
+        function getStatusClass(status) {
+            switch (status) {
+                case 'مشغول': return 'status-occupied';
+                case 'متاح': return 'status-available';
+                case 'محجوز': return 'status-reserved';
+                case 'صيانة': return 'status-maintenance';
+                default: return 'status-available';
+            }
+        }
+
+        // الحصول على أيقونة الحالة
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'مشغول': return 'fas fa-car';
+                case 'متاح': return 'fas fa-check-circle';
+                case 'محجوز': return 'fas fa-bookmark';
+                case 'صيانة': return 'fas fa-tools';
+                default: return 'fas fa-question-circle';
+            }
+        }
+
+        // تحديث أزرار الترقيم
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                paginationHTML += `<button onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span>...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span>...</span>`;
+                }
+                paginationHTML += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            paginationHTML += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // تغيير الصفحة
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayTable();
+            }
+        }
+
+        // تصدير إلى Excel
+        function exportToExcel() {
+            const data = filteredData.map(parking => ({
+                'رقم الموقف': parking['رقم الموقف'] || '',
+                'المبنى': parking.المبنى || '',
+                'الشقة': parking.الشقة || '',
+                'اسم الساكن': parking.اسم_الساكن || '',
+                'حالة الشقة': parking.حالة_الشقة || '',
+                'حالة الموقف': parking.حالة_الموقف || parking.الحالة || '',
+                'مربع الوقوف': parking['مربع الوقوف'] || '',
+                'وصف المبنى': parking.وصف_المبنى || ''
+            }));
+
+            // تحويل البيانات إلى CSV
+            const headers = Object.keys(data[0]);
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => headers.map(header => `"${row[header]}"`).join(','))
+            ].join('\n');
+
+            // تحميل الملف
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `مواقف_مربوطة_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // إضافة مستمعي الأحداث
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('buildingFilter').addEventListener('change', applyFilters);
+
+        // تحميل البيانات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', loadParkingData);
+    </script>
+</body>
+</html>
+

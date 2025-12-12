@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة إسكان أعضاء هيئة التدريس </title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:700,400&display=swap">
+  <style>
+    html, body { direction: rtl !important; }
+    body { font-family: 'Tajawal', Arial, sans-serif; background: linear-gradient(120deg, #e0e7ef 0%, #f7fcff 100%); margin: 0;}
+    .header {
+      background: linear-gradient(90deg, #0f3d68 60%, #2e8bc0 100%);
+      color: #fff;
+      padding: 26px 0 20px 0;
+      margin-bottom: 36px;
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 6px 16px #2e8bc055;
+      text-align: right;
+    }
+    .header-title { font-size: 2.4em; font-weight: bold; margin: 0; }
+    .header-subtitle { margin: 0; font-size: 1.25em; font-weight: 400; color: #e2eaf3; }
+    .main-container {
+      max-width: 1350px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .section {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 0 14px #123C6910;
+      padding: 18px 14px 22px 14px;
+      margin-bottom: 36px;
+      width: 87%;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .section-title {
+      font-size: 1.15em;
+      font-weight: bold;
+      color: #0f3d68;
+      margin-bottom: 16px;
+      border-right: 5px solid #2e8bc0;
+      padding-right: 12px;
+      text-align: center;
+      width: 100%;
+    }
+    .group-grid {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px 34px;
+    }
+    .main-card {
+      background: #f9fbfd;
+      border-radius: 16px;
+      box-shadow: 0 0 12px #2e8bc022;
+      padding: 18px 16px 13px 16px;
+      text-align: center;
+      transition: box-shadow 0.2s, transform 0.2s;
+      border: 2px solid #e0e7ef;
+      min-height: 135px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      width: 255px;
+      max-width: 98vw;
+    }
+    .main-card:hover { box-shadow: 0 12px 30px #0f3d6840; transform: translateY(-4px) scale(1.03); border-color: #2e8bc0;}
+    .main-card-icon { font-size: 2.2em; margin-bottom: 7px; color: #2e8bc0;}
+    .main-card-title { font-weight: bold; font-size: 1.08em; color: #0f3d68; margin-bottom: 8px;}
+    .main-card-link {display:inline-block; background: linear-gradient(90deg, #2e8bc0 70%, #0f3d68 100%); color: #fff; padding: 7px 26px; border-radius: 8px; font-size: 1em; font-weight:700; text-decoration:none; box-shadow: 0 2px 8px #2e8bc055; border:none; margin-top:7px;}
+    .main-card-link:hover { background: linear-gradient(90deg, #0f3d68 70%, #2e8bc0 100%);}
+    .main-card-desc { color: #456; font-size: 0.97em; min-height: 30px;}
+    .footer { text-align: center; color: #8a8b95; font-size: 0.98em; margin-top: 38px; margin-bottom: 8px; padding-top: 14px; border-top: 1px solid #d7dbe4;}
+    @media (max-width:1200px){
+      .main-container {width:99vw;}
+      .section {width:98vw;}
+      .group-grid{gap:18px;}
+    }
+    @media (max-width:900px){
+      .main-container {width:100vw;}
+      .section {width:100vw; padding:12px 3px 18px 3px; min-width: 0;}
+      .group-grid{gap:12px;}
+      .main-card{padding:12px 3px; max-width:99vw;}
+    }
+    @media (max-width:600px){
+      .main-container {width:100vw;}
+      .section{width:100vw;}
+      .group-grid{flex-direction:column; align-items:center;}
+      .main-card{margin-bottom:8px; width:97vw;}
+      .section-title{text-align:center; padding-right:0;}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+   <div class="header-title">نظام إدارة إسكان أعضاء هيئة التدريس</div>
+    <div class="header-subtitle">جامعة الإمام محمد بن سعود الإسلامية</div>
+  </div>
+  <div class="main-container">
+    <!-- السكن والمباني -->
+    <div class="section">
+      <div class="section-title">السكن والمباني</div>
+      <div class="group-grid">
+        <div class="main-card">
+          <span class="main-card-icon">🏢</span>
+          <div class="main-card-title">إدارة المباني</div>
+          <div class="main-card-desc">إضافة وتعديل بيانات المباني السكنية</div>
+          <a href="نظام إدارة المباني - أعضاء هيئة التدريس.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🏠</span>
+          <div class="main-card-title">إدارة الشقق</div>
+          <div class="main-card-desc">إدارة الوحدات السكنية وحالاتها</div>
+          <a href="نظام متابعة المباني.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">👨‍🏫</span>
+          <div class="main-card-title">إدارة السكان</div>
+          <div class="main-card-desc">بيانات أعضاء هيئة التدريس المقيمين</div>
+          <a href="ادخال-وعرض-بيانات-السكان_Version5.html" class="main-card-link">فتح</a>
+        </div>
+      </div>
+    </div>
+    <!-- السيارات والمواقف -->
+    <div class="section">
+      <div class="section-title">السيارات والمواقف</div>
+      <div class="group-grid">
+        <div class="main-card">
+          <span class="main-card-icon">🚗</span>
+          <div class="main-card-title">ملصقات السيارات</div>
+          <div class="main-card-desc">إدارة تصاريح السيارات</div>
+          <a href="نظام إدارة ملصقات سيارات إسكان أعضاء هيئة التدريس.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🚗</span>
+          <div class="main-card-title">السيارات المكبوحة</div>
+          <div class="main-card-desc">إدارة سيارات مكبوحة في الإسكان</div>
+          <a href="سيارات مكبوحة - إسكان أعضاء هيئة التدريس.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🛻</span>
+          <div class="main-card-title">دخول وخروج سيارات على سطحة</div>
+          <div class="main-card-desc">تسجيل ومتابعة دخول وخروج السيارات على سطحة</div>
+          <a href="نظام متابعة دخول وخروج السيارات المنقولة عبر سطحه نقل.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🚦</span>
+          <div class="main-card-title">المخالفات المرورية</div>
+          <div class="main-card-desc">تسجيل ومتابعة المخالفات</div>
+          <a href="المخالفات المرورية جديد.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🅿️</span>
+          <div class="main-card-title">المواقف</div>
+          <div class="main-card-desc">إدارة المواقف وشكاوي وتعهدات السكان</div>
+          <a href="إدارة المواقف وشكاوي وتعهدات السكان.html" class="main-card-link">فتح</a>
+        </div>
+      </div>
+    </div>
+    <!-- الأمن والسلامة -->
+    <div class="section">
+      <div class="section-title">الأمن والسلامة</div>
+      <div class="group-grid">
+        <div class="main-card">
+          <span class="main-card-icon">🛡️</span>
+          <div class="main-card-title">الوقائع الأمنية</div>
+          <div class="main-card-desc">تسجيل ومتابعة الشكاوى الأمنية</div>
+          <a href="نظام إدارة الوقائع الأمنية.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🚨</span>
+          <div class="main-card-title">بلاغات أمنية</div>
+          <div class="main-card-desc">تسجيل ومتابعة البلاغات الأمنية</div>
+          <a href="نموذج بلاغات أمنية ومراقبة الدخول والخروج.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🎥</span>
+          <div class="main-card-title">مراقبة الدخول والخروج</div>
+          <div class="main-card-desc">متابعة وإدارة دخول وخروج الأشخاص</div>
+          <a href="بلاغات أمنية ومراقبة الدخول والخروج.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🚨</span>
+          <div class="main-card-title">الحوادث المرورية</div>
+          <div class="main-card-desc">إدارة الحوادث المرورية</div>
+          <a href="نموذج تسجيل حادث مروري.html" class="main-card-link">فتح</a>
+        </div>
+      </div>
+    </div>
+    <!-- الشكاوى والمتابعة والتراخيص -->
+    <div class="section">
+      <div class="section-title">الشكاوى والمتابعة والتراخيص</div>
+      <div class="group-grid">
+        <div class="main-card">
+          <span class="main-card-icon">📋</span>
+          <div class="main-card-title">الشكاوى والمتابعة</div>
+          <div class="main-card-desc">إدارة الشكاوى والمتابعة</div>
+          <a href="إدارة الشكاوى - إدخال البيانات.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">🗒️</span>
+          <div class="main-card-title">سجل الزوار</div>
+          <div class="main-card-desc">إدارة سجل الزوار</div>
+          <a href="سجل زوار إسكان أعضاء هيئة التدريس.html" class="main-card-link">فتح</a>
+        </div>
+        <div class="main-card">
+          <span class="main-card-icon">📝</span>
+          <div class="main-card-title">التراخيص</div>
+          <div class="main-card-desc">إدارة التصاريح المختلفة</div>
+          <a href="متابعة تراخيص الدخول.html" class="main-card-link">فتح</a>
+        </div>
+      </div>
+    </div>
+    <!-- التقارير والإحصاءات -->
+    <div class="section">
+      <div class="section-title">التقارير والإحصاءات</div>
+      <div class="group-grid">
+        <div class="main-card">
+          <span class="main-card-icon">📊</span>
+          <div class="main-card-title">التقارير والإحصاءات</div>
+          <div class="main-card-desc">عرض تقارير وإحصاءات شاملة للنظام</div>
+          <a href="التقارير والإحصائيات.html" class="main-card-link">فتح</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      جميع الحقوق محفوظة © جامعة الإمام محمد بن سعود الإسلامية 2025
+    </div>
+  </div>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>

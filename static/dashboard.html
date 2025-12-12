@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .university-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .title-section h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .title-section p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user-role {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .quick-access {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .system-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .system-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .system-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .system-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .system-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .system-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .system-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #7f8c8d;
+            background: white;
+            margin-top: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* استجابة للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .logo-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .title-section h1 {
+                font-size: 24px;
+            }
+
+            .systems-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-access {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .system-actions {
+                justify-content: center;
+            }
+        }
+
+        /* تأثيرات الحركة */
+        .system-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="university_logo.png" alt="شعار الجامعة" class="university-logo">
+                <div class="title-section">
+                    <h1>نظام إدارة إسكان أعضاء هيئة التدريس</h1>
+                    <p>جامعة الإمام محمد بن سعود الإسلامية</p>
+                </div>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name" id="userName">مدير النظام</div>
+                    <div class="user-role" id="userRole">admin</div>
+                </div>
+                <a href="index.html" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- قسم الترحيب -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">مرحباً بك في لوحة التحكم</h1>
+            <p class="welcome-subtitle">إدارة شاملة لنظام إسكان أعضاء هيئة التدريس</p>
+            <div class="quick-access">
+                <a href="main_dashboard.html" class="quick-btn">
+                    <i class="fas fa-home"></i>
+                    الصفحة الرئيسية
+                </a>
+                <a href="advanced_users_management.html" class="quick-btn">
+                    <i class="fas fa-users-cog"></i>
+                    إدارة المستخدمين
+                </a>
+                <a href="reports.html" class="quick-btn">
+                    <i class="fas fa-chart-bar"></i>
+                    التقارير
+                </a>
+            </div>
+        </div>
+
+        <!-- شبكة الأنظمة -->
+        <div class="systems-grid">
+            <!-- إدارة المباني -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="system-title">إدارة المباني</h3>
+                </div>
+                <p class="system-description">
+                    إدارة شاملة للمباني السكنية (165 مبنى) مع تفاصيل الفلل والشقق وحالات الإشغال
+                </p>
+                <div class="system-actions">
+                    <a href="buildings_management_updated.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        إضافة مبنى
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-chart-line"></i>
+                        الإحصائيات
+                    </a>
+                </div>
+            </div>
+
+            <!-- إدارة السكان -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="system-title">إدارة السكان</h3>
+                </div>
+                <p class="system-description">
+                    إدارة بيانات أعضاء هيئة التدريس (1,136 ساكن) مع تفاصيل السكن والاتصال
+                </p>
+                <div class="system-actions">
+                    <a href="residents_management_updated.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-user-plus"></i>
+                        إضافة ساكن
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-search"></i>
+                        البحث
+                    </a>
+                </div>
+            </div>
+
+            <!-- إدارة المواقف -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3 class="system-title">إدارة المواقف</h3>
+                </div>
+                <p class="system-description">
+                    إدارة المواقف (1,133 موقف) مع ربطها بالشقق والسكان وحالات الإشغال
+                </p>
+                <div class="system-actions">
+                    <a href="parking_management_linked.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        إضافة موقف
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-link"></i>
+                        ربط المواقف
+                    </a>
+                </div>
+            </div>
+
+            <!-- إدارة الملصقات -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="system-title">إدارة الملصقات</h3>
+                </div>
+                <p class="system-description">
+                    إدارة ملصقات السيارات مع ربطها ببيانات السكان والمواقف
+                </p>
+                <div class="system-actions">
+                    <a href="نظامإدارةملصقاتسياراتإسكانأعضاءهيئةالتدريس.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        إضافة ملصق
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-print"></i>
+                        طباعة
+                    </a>
+                </div>
+            </div>
+
+            <!-- المخالفات المرورية -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="system-title">المخالفات المرورية</h3>
+                </div>
+                <p class="system-description">
+                    تسجيل ومتابعة المخالفات المرورية (15 مخالفة) مع ربطها بالسكان والسيارات
+                </p>
+                <div class="system-actions">
+                    <a href="traffic_violations.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        تسجيل مخالفة
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-list"></i>
+                        المخالفات النشطة
+                    </a>
+                </div>
+            </div>
+
+            <!-- السيارات المكبوحة -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-car-crash"></i>
+                    </div>
+                    <h3 class="system-title">السيارات المكبوحة</h3>
+                </div>
+                <p class="system-description">
+                    إدارة السيارات المكبوحة مع تفاصيل الأسباب والإجراءات المتخذة
+                </p>
+                <div class="system-actions">
+                    <a href="immobilized_cars_management.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        إضافة سيارة
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-unlock"></i>
+                        إلغاء الكبح
+                    </a>
+                </div>
+            </div>
+
+            <!-- الشكاوى والمتابعة -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-comment-alt"></i>
+                    </div>
+                    <h3 class="system-title">الشكاوى والمتابعة</h3>
+                </div>
+                <p class="system-description">
+                    إدارة شكاوى السكان ومتابعة حلولها مع نظام تتبع شامل
+                </p>
+                <div class="system-actions">
+                    <a href="complaints_management.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        تسجيل شكوى
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-clock"></i>
+                        المتابعة
+                    </a>
+                </div>
+            </div>
+
+            <!-- إدارة المستخدمين -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h3 class="system-title">إدارة المستخدمين</h3>
+                </div>
+                <p class="system-description">
+                    إدارة متقدمة للمستخدمين مع تحديد الأدوار والصلاحيات
+                </p>
+                <div class="system-actions">
+                    <a href="advanced_users_management.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-user-plus"></i>
+                        إضافة مستخدم
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-key"></i>
+                        الصلاحيات
+                    </a>
+                </div>
+            </div>
+
+            <!-- التقارير والإحصائيات -->
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="system-title">التقارير والإحصائيات</h3>
+                </div>
+                <p class="system-description">
+                    تقارير شاملة وإحصائيات تفصيلية لجميع أقسام النظام
+                </p>
+                <div class="system-actions">
+                    <a href="reports.html" class="action-btn primary">
+                        <i class="fas fa-cog"></i>
+                        فتح النظام
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-file-pdf"></i>
+                        تصدير PDF
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-file-excel"></i>
+                        تصدير Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>جميع الحقوق محفوظة © جامعة الإمام محمد بن سعود الإسلامية 2025</p>
+    </footer>
+
+    <script>
+        // تحميل بيانات المستخدم
+        window.addEventListener('load', function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userRole').textContent = user.role;
+            } else {
+                // إعادة توجيه إلى صفحة الدخول إذا لم يكن مسجل دخول
+                window.location.href = 'index.html';
+            }
+        });
+
+        // تسجيل الخروج
+        document.querySelector('.logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+
+        // تحديث الإحصائيات كل 30 ثانية
+        setInterval(function() {
+            // هنا يمكن إضافة كود لتحديث الإحصائيات من الخادم
+            console.log('تحديث الإحصائيات...');
+        }, 30000);
+    </script>
+</body>
+</html>
+

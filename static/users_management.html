@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة المستخدمين - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Tajawal:700,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: linear-gradient(120deg, #e0e7ef 0%, #f7fcff 100%);
+      margin: 0;
+      padding: 20px 0;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #0f3d68 60%, #2e8bc0 100%);
+      color: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 6px 16px rgba(15, 61, 104, 0.2);
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      margin: 10px 0 0 0;
+      opacity: 0.9;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .home-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #0f3d68;
+      border-bottom: 2px solid #e3f2fd;
+      padding-bottom: 10px;
+    }
+
+    .user-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid #e3f2fd;
+      transition: all 0.3s ease;
+    }
+
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .user-details h5 {
+      color: #0f3d68;
+      margin-bottom: 5px;
+    }
+
+    .user-role {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: inline-block;
+    }
+
+    .role-admin {
+      background: #dc3545;
+      color: white;
+    }
+
+    .role-violations {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .role-visitors {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .role-readonly {
+      background: #6c757d;
+      color: white;
+    }
+
+    .user-status {
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+
+    .status-active {
+      background: #28a745;
+      color: white;
+    }
+
+    .status-inactive {
+      background: #dc3545;
+      color: white;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: none;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-toggle {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .btn-permissions {
+      background: #6f42c1;
+      color: white;
+    }
+
+    .add-user-form {
+      background: #e3f2fd;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 15px;
+    }
+
+    .btn-primary {
+      background: #0f3d68;
+      border-color: #0f3d68;
+      border-radius: 8px;
+      padding: 10px 25px;
+    }
+
+    .btn-primary:hover {
+      background: #2e8bc0;
+      border-color: #2e8bc0;
+    }
+
+    .permissions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .permission-item {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-export {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-export:hover {
+      background: #218838;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.8em;
+      }
+      
+      .user-info {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .user-actions {
+        margin-top: 10px;
+        width: 100%;
+      }
+      
+      .export-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="back-button">
+    <a href="dashboard.html" class="btn btn-secondary">
+      <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
+    </a>
+  </div>
+
+  <div class="home-button">
+    <a href="index.html" class="btn btn-outline-light">
+      <i class="fas fa-home"></i> الصفحة الرئيسية
+    </a>
+  </div>
+
+  <div class="header">
+    <div class="container">
+      <h1><i class="fas fa-users-cog"></i> إدارة المستخدمين</h1>
+      <p>نظام إدارة إسكان أعضاء هيئة التدريس - جامعة الإمام محمد بن سعود الإسلامية</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- أزرار التصدير -->
+    <div class="content-section">
+      <div class="export-buttons">
+        <button class="btn-export" onclick="exportToPDF()">
+          <i class="fas fa-file-pdf"></i> تصدير PDF
+        </button>
+        <button class="btn-export" onclick="exportToExcel()">
+          <i class="fas fa-file-excel"></i> تصدير Excel
+        </button>
+        <button class="btn btn-info" onclick="showAddUserForm()">
+          <i class="fas fa-user-plus"></i> إضافة مستخدم جديد
+        </button>
+      </div>
+    </div>
+
+    <!-- نموذج إضافة مستخدم جديد -->
+    <div class="content-section" id="addUserSection" style="display: none;">
+      <h3 class="section-title"><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h3>
+      <div class="add-user-form">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="newUsername" class="form-label">اسم المستخدم</label>
+            <input type="text" class="form-control" id="newUsername" placeholder="أدخل اسم المستخدم">
+          </div>
+          <div class="col-md-6">
+            <label for="newPassword" class="form-label">كلمة المرور</label>
+            <input type="password" class="form-control" id="newPassword" placeholder="أدخل كلمة المرور">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="newFullName" class="form-label">الاسم الكامل</label>
+            <input type="text" class="form-control" id="newFullName" placeholder="أدخل الاسم الكامل">
+          </div>
+          <div class="col-md-6">
+            <label for="newEmail" class="form-label">البريد الإلكتروني</label>
+            <input type="email" class="form-control" id="newEmail" placeholder="أدخل البريد الإلكتروني">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="newRole" class="form-label">الدور</label>
+            <select class="form-select" id="newRole">
+              <option value="">اختر الدور</option>
+              <option value="admin">مدير النظام</option>
+              <option value="violations">مسجل المخالفات</option>
+              <option value="visitors">مسجل الزوار</option>
+              <option value="readonly">قراءة فقط</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="newPhone" class="form-label">رقم الهاتف</label>
+            <input type="tel" class="form-control" id="newPhone" placeholder="أدخل رقم الهاتف">
+          </div>
+        </div>
+        
+        <!-- الصلاحيات -->
+        <div class="mt-3">
+          <label class="form-label">الصلاحيات</label>
+          <div class="permissions-grid" id="permissionsGrid">
+            <div class="permission-item">
+              <input type="checkbox" id="perm_buildings" class="form-check-input">
+              <label for="perm_buildings" class="form-check-label">إدارة المباني</label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm_residents" class="form-check-input">
+              <label for="perm_residents" class="form-check-label">إدارة السكان</label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm_parking" class="form-check-input">
+              <label for="perm_parking" class="form-check-label">إدارة المواقف</label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm_violations" class="form-check-input">
+              <label for="perm_violations" class="form-check-label">المخالفات المرورية</label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm_visitors" class="form-check-input">
+              <label for="perm_visitors" class="form-check-label">سجل الزوار</label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm_reports" class="form-check-input">
+              <label for="perm_reports" class="form-check-label">التقارير</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-3">
+          <button class="btn btn-primary" onclick="addNewUser()">
+            <i class="fas fa-save"></i> حفظ المستخدم
+          </button>
+          <button class="btn btn-secondary" onclick="hideAddUserForm()">
+            <i class="fas fa-times"></i> إلغاء
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- قائمة المستخدمين -->
+    <div class="content-section">
+      <h3 class="section-title"><i class="fas fa-users"></i> قائمة المستخدمين</h3>
+      <div id="usersList">
+        <!-- سيتم ملء البيانات هنا -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF للتصدير -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- SheetJS للتصدير إلى Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    // بيانات المستخدمين
+    let users = [
+      {
+        id: 1,
+        username: 'admin',
+        fullName: 'مدير النظام',
+        email: 'admin@university.edu.sa',
+        phone: '0501234567',
+        role: 'admin',
+        status: 'active',
+        lastLogin: '2025-01-27 10:30',
+        permissions: ['buildings', 'residents', 'parking', 'violations', 'visitors', 'reports', 'users']
+      },
+      {
+        id: 2,
+        username: 'violations_officer',
+        fullName: 'مسجل المخالفات',
+        email: 'violations@university.edu.sa',
+        phone: '0507654321',
+        role: 'violations',
+        status: 'active',
+        lastLogin: '2025-01-27 09:15',
+        permissions: ['violations', 'reports']
+      },
+      {
+        id: 3,
+        username: 'visitors_officer',
+        fullName: 'مسجل الزوار',
+        email: 'visitors@university.edu.sa',
+        phone: '0509876543',
+        role: 'visitors',
+        status: 'active',
+        lastLogin: '2025-01-26 16:45',
+        permissions: ['visitors', 'reports']
+      },
+      {
+        id: 4,
+        username: 'readonly_user',
+        fullName: 'مستخدم قراءة فقط',
+        email: 'readonly@university.edu.sa',
+        phone: '0502468135',
+        role: 'readonly',
+        status: 'inactive',
+        lastLogin: '2025-01-25 14:20',
+        permissions: ['reports']
+      }
+    ];
+
+    // تحميل قائمة المستخدمين
+    function loadUsers() {
+      const usersList = document.getElementById('usersList');
+      usersList.innerHTML = users.map(user => `
+        <div class="user-card">
+          <div class="user-info">
+            <div class="user-details">
+              <h5>${user.fullName}</h5>
+              <div class="user-role ${getRoleClass(user.role)}">${getRoleText(user.role)}</div>
+              <div class="user-status ${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                ${user.status === 'active' ? 'نشط' : 'غير نشط'}
+              </div>
+              <small class="text-muted">آخر دخول: ${user.lastLogin}</small>
+            </div>
+            <div class="user-actions">
+              <button class="action-btn btn-edit" onclick="editUser(${user.id})">
+                <i class="fas fa-edit"></i> تعديل
+              </button>
+              <button class="action-btn btn-permissions" onclick="showPermissions(${user.id})">
+                <i class="fas fa-key"></i> الصلاحيات
+              </button>
+              <button class="action-btn btn-toggle" onclick="toggleUserStatus(${user.id})">
+                <i class="fas fa-power-off"></i> ${user.status === 'active' ? 'إيقاف' : 'تفعيل'}
+              </button>
+              ${user.role !== 'admin' ? `
+                <button class="action-btn btn-delete" onclick="deleteUser(${user.id})">
+                  <i class="fas fa-trash"></i> حذف
+                </button>
+              ` : ''}
+            </div>
+          </div>
+          <div class="mt-2">
+            <small><strong>اسم المستخدم:</strong> ${user.username}</small><br>
+            <small><strong>البريد:</strong> ${user.email}</small><br>
+            <small><strong>الهاتف:</strong> ${user.phone}</small>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // الحصول على فئة CSS للدور
+    function getRoleClass(role) {
+      const classes = {
+        'admin': 'role-admin',
+        'violations': 'role-violations',
+        'visitors': 'role-visitors',
+        'readonly': 'role-readonly'
+      };
+      return classes[role] || 'role-readonly';
+    }
+
+    // الحصول على نص الدور
+    function getRoleText(role) {
+      const texts = {
+        'admin': 'مدير النظام',
+        'violations': 'مسجل المخالفات',
+        'visitors': 'مسجل الزوار',
+        'readonly': 'قراءة فقط'
+      };
+      return texts[role] || 'غير محدد';
+    }
+
+    // إظهار نموذج إضافة مستخدم
+    function showAddUserForm() {
+      document.getElementById('addUserSection').style.display = 'block';
+      document.getElementById('addUserSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // إخفاء نموذج إضافة مستخدم
+    function hideAddUserForm() {
+      document.getElementById('addUserSection').style.display = 'none';
+      clearAddUserForm();
+    }
+
+    // مسح نموذج إضافة مستخدم
+    function clearAddUserForm() {
+      document.getElementById('newUsername').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('newFullName').value = '';
+      document.getElementById('newEmail').value = '';
+      document.getElementById('newRole').value = '';
+      document.getElementById('newPhone').value = '';
+      
+      // مسح الصلاحيات
+      const checkboxes = document.querySelectorAll('#permissionsGrid input[type="checkbox"]');
+      checkboxes.forEach(checkbox => checkbox.checked = false);
+    }
+
+    // إضافة مستخدم جديد
+    function addNewUser() {
+      const username = document.getElementById('newUsername').value;
+      const password = document.getElementById('newPassword').value;
+      const fullName = document.getElementById('newFullName').value;
+      const email = document.getElementById('newEmail').value;
+      const role = document.getElementById('newRole').value;
+      const phone = document.getElementById('newPhone').value;
+
+      if (!username || !password || !fullName || !email || !role) {
+        alert('يرجى ملء جميع الحقول المطلوبة');
+        return;
+      }
+
+      // التحقق من عدم تكرار اسم المستخدم
+      if (users.find(user => user.username === username)) {
+        alert('اسم المستخدم موجود بالفعل');
+        return;
+      }
+
+      // جمع الصلاحيات المحددة
+      const permissions = [];
+      const checkboxes = document.querySelectorAll('#permissionsGrid input[type="checkbox"]:checked');
+      checkboxes.forEach(checkbox => {
+        permissions.push(checkbox.id.replace('perm_', ''));
+      });
+
+      const newUser = {
+        id: users.length + 1,
+        username: username,
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        role: role,
+        status: 'active',
+        lastLogin: 'لم يسجل دخول بعد',
+        permissions: permissions
+      };
+
+      users.push(newUser);
+      loadUsers();
+      hideAddUserForm();
+      alert('تم إضافة المستخدم بنجاح');
+    }
+
+    // تعديل مستخدم
+    function editUser(userId) {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        const newFullName = prompt('الاسم الكامل:', user.fullName);
+        const newEmail = prompt('البريد الإلكتروني:', user.email);
+        const newPhone = prompt('رقم الهاتف:', user.phone);
+        
+        if (newFullName && newEmail && newPhone) {
+          user.fullName = newFullName;
+          user.email = newEmail;
+          user.phone = newPhone;
+          loadUsers();
+          alert('تم تحديث بيانات المستخدم بنجاح');
+        }
+      }
+    }
+
+    // حذف مستخدم
+    function deleteUser(userId) {
+      if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+        users = users.filter(user => user.id !== userId);
+        loadUsers();
+        alert('تم حذف المستخدم بنجاح');
+      }
+    }
+
+    // تبديل حالة المستخدم
+    function toggleUserStatus(userId) {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        user.status = user.status === 'active' ? 'inactive' : 'active';
+        loadUsers();
+        alert(`تم ${user.status === 'active' ? 'تفعيل' : 'إيقاف'} المستخدم بنجاح`);
+      }
+    }
+
+    // عرض الصلاحيات
+    function showPermissions(userId) {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        const permissionsText = user.permissions.map(perm => {
+          const permNames = {
+            'buildings': 'إدارة المباني',
+            'residents': 'إدارة السكان',
+            'parking': 'إدارة المواقف',
+            'violations': 'المخالفات المرورية',
+            'visitors': 'سجل الزوار',
+            'reports': 'التقارير',
+            'users': 'إدارة المستخدمين'
+          };
+          return permNames[perm] || perm;
+        }).join('\n- ');
+        
+        alert(`صلاحيات المستخدم: ${user.fullName}\n\n- ${permissionsText}`);
+      }
+    }
+
+    // تصدير إلى PDF
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // إضافة العنوان
+      doc.text('قائمة المستخدمين', 105, 20, { align: 'center' });
+      
+      let yPosition = 40;
+      users.forEach(user => {
+        doc.text(`الاسم: ${user.fullName}`, 20, yPosition);
+        doc.text(`الدور: ${getRoleText(user.role)}`, 20, yPosition + 10);
+        doc.text(`الحالة: ${user.status === 'active' ? 'نشط' : 'غير نشط'}`, 20, yPosition + 20);
+        yPosition += 40;
+        
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      });
+      
+      doc.save('قائمة_المستخدمين.pdf');
+    }
+
+    // تصدير إلى Excel
+    function exportToExcel() {
+      const ws = XLSX.utils.json_to_sheet(users.map(user => ({
+        'اسم المستخدم': user.username,
+        'الاسم الكامل': user.fullName,
+        'البريد الإلكتروني': user.email,
+        'الهاتف': user.phone,
+        'الدور': getRoleText(user.role),
+        'الحالة': user.status === 'active' ? 'نشط' : 'غير نشط',
+        'آخر دخول': user.lastLogin
+      })));
+      
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'المستخدمين');
+      XLSX.writeFile(wb, 'قائمة_المستخدمين.xlsx');
+    }
+
+    // تحميل البيانات عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUsers();
+    });
+  </script>
+</body>
+</html>
+

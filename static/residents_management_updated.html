@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة السكان - إسكان أعضاء هيئة التدريس</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            padding: 10px;
+        }
+
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .residents-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .residents-table th {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .residents-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s ease;
+        }
+
+        .residents-table tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        .unit-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .unit-villa {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .unit-apartment {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .whatsapp-btn:hover {
+            background: #128c7e;
+            transform: scale(1.05);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .reports-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .report-card:hover {
+            transform: translateY(-3px);
+            border-color: #2a5298;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .report-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #2a5298;
+        }
+
+        .report-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .whatsapp-section {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .whatsapp-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .message-textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        .pagination button.active {
+            background: #2a5298;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-info">
+                    <h1 class="header-title">
+                        <i class="fas fa-users"></i>
+                        إدارة السكان
+                        <img src="IMG_1093.png" alt="شعار الجامعة" class="logo">
+                    </h1>
+                    <p class="header-subtitle">نظام إدارة بيانات سكان إسكان أعضاء هيئة التدريس</p>
+                </div>
+                <a href="dashboard.html" class="back-button">
+                    <i class="fas fa-home"></i>
+                    العودة للوحة التحكم
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #2a5298;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" style="color: #2a5298;" id="totalResidents">0</div>
+                <div class="stat-label">إجمالي السكان</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #28a745;">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="stat-number" style="color: #28a745;" id="villaResidents">0</div>
+                <div class="stat-label">سكان الفلل</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #007bff;">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-number" style="color: #007bff;" id="apartmentResidents">0</div>
+                <div class="stat-label">سكان الشقق</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #17a2b8;">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="stat-number" style="color: #17a2b8;" id="occupancyRate">0%</div>
+                <div class="stat-label">معدل الإشغال</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <h2 class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                توزيع السكان حسب نوع الوحدة
+            </h2>
+            <div style="max-width: 400px; margin: 0 auto;">
+                <canvas id="residentsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="reports-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                التقارير والإحصائيات
+            </h2>
+            <div class="reports-grid">
+                <div class="report-card" onclick="generateReport('daily')">
+                    <div class="report-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="report-title">تقرير يومي</div>
+                </div>
+                <div class="report-card" onclick="generateReport('weekly')">
+                    <div class="report-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="report-title">تقرير أسبوعي</div>
+                </div>
+                <div class="report-card" onclick="generateReport('monthly')">
+                    <div class="report-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="report-title">تقرير شهري</div>
+                </div>
+                <div class="report-card" onclick="exportToExcel()">
+                    <div class="report-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div class="report-title">تصدير Excel</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WhatsApp Section -->
+        <div class="whatsapp-section">
+            <h2 class="section-title" style="color: white;">
+                <i class="fab fa-whatsapp"></i>
+                إرسال رسائل واتساب
+            </h2>
+            <div class="whatsapp-controls">
+                <button class="btn btn-success" onclick="sendBulkWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                    إرسال لجميع السكان
+                </button>
+                <button class="btn btn-info" onclick="sendFilteredWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                    إرسال للمعروضين حالياً
+                </button>
+            </div>
+            <textarea class="message-textarea" id="whatsappMessage" placeholder="اكتب رسالتك هنا...">
+السلام عليكم ورحمة الله وبركاته
+
+تحية طيبة وبعد،
+
+نود إعلامكم بأهمية...
+
+مع تحيات إدارة إسكان أعضاء هيئة التدريس
+جامعة الإمام محمد بن سعود الإسلامية
+            </textarea>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2 class="section-title">
+                <i class="fas fa-list"></i>
+                قائمة السكان
+            </h2>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <input type="text" class="search-box" id="searchInput" placeholder="البحث بالاسم أو الوحدة أو رقم الهوية أو الجوال...">
+                <select class="filter-select" id="unitTypeFilter">
+                    <option value="">جميع أنواع الوحدات</option>
+                    <option value="فيلا">الفلل فقط</option>
+                    <option value="شقة">الشقق فقط</option>
+                </select>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        تحديث البيانات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="residents-table">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>الوحدة السكنية</th>
+                            <th>نوع الوحدة</th>
+                            <th>رقم الهوية</th>
+                            <th>رقم الجوال</th>
+                            <th>واتساب</th>
+                        </tr>
+                    </thead>
+                    <tbody id="residentsTableBody">
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- نظام الربط الشامل -->
+  <script src="system_integration.js"></script>
+  <!-- ودجت المراجع المتقاطعة -->
+  <script src="cross_reference_widget.js"></script>
+  <link rel="stylesheet" href="integration_styles.css">
+  
+  <script>
+        let residentsData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 50;
+
+        // Load residents data
+        async function loadResidentsData() {
+            try {
+                const response = await fetch('residents_data.json');
+                residentsData = await response.json();
+                filteredData = [...residentsData];
+                
+                updateStatistics();
+                updateChart();
+                displayResidents();
+                setupEventListeners();
+                
+                console.log('تم تحميل بيانات السكان:', residentsData.length, 'ساكن');
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                document.getElementById('residentsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="color: red; text-align: center;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            خطأ في تحميل البيانات
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const total = residentsData.length;
+            const villas = residentsData.filter(r => isVilla(r.الوحدة_السكنية)).length;
+            const apartments = total - villas;
+            const occupancyRate = Math.round((total / 1200) * 100); // افتراض 1200 وحدة إجمالية
+
+            document.getElementById('totalResidents').textContent = total.toLocaleString();
+            document.getElementById('villaResidents').textContent = villas.toLocaleString();
+            document.getElementById('apartmentResidents').textContent = apartments.toLocaleString();
+            document.getElementById('occupancyRate').textContent = occupancyRate + '%';
+        }
+
+        // Update chart
+        function updateChart() {
+            const villas = residentsData.filter(r => isVilla(r.الوحدة_السكنية)).length;
+            const apartments = residentsData.length - villas;
+
+            const ctx = document.getElementById('residentsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['الفلل', 'الشقق'],
+                    datasets: [{
+                        data: [villas, apartments],
+                        backgroundColor: [
+                            'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                            'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Tajawal',
+                                    size: 14
+                                },
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Check if unit is villa
+        function isVilla(unit) {
+            return unit && (unit.includes('فل') || unit.toLowerCase().includes('villa'));
+        }
+
+        // Get unit type
+        function getUnitType(unit) {
+            return isVilla(unit) ? 'فيلا' : 'شقة';
+        }
+
+        // Display residents
+        function displayResidents() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            const tbody = document.getElementById('residentsTableBody');
+            
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #666;">
+                            <i class="fas fa-search"></i>
+                            لا توجد نتائج مطابقة للبحث
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(resident => {
+                const unitType = getUnitType(resident.الوحدة_السكنية);
+                const unitClass = unitType === 'فيلا' ? 'unit-villa' : 'unit-apartment';
+                const unitIcon = unitType === 'فيلا' ? 'fas fa-home' : 'fas fa-building';
+                
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${resident.الاسم || 'غير محدد'}</td>
+                        <td>${resident.الوحدة_السكنية || 'غير محدد'}</td>
+                        <td>
+                            <span class="unit-badge ${unitClass}">
+                                <i class="${unitIcon}"></i>
+                                ${unitType}
+                            </span>
+                        </td>
+                        <td style="font-family: monospace;">${resident.رقم_الهوية || 'غير محدد'}</td>
+                        <td style="font-family: monospace;">${resident.رقم_الجوال || 'غير محدد'}</td>
+                        <td>
+                            ${resident.رقم_الجوال ? `
+                                <a href="https://wa.me/966${resident.رقم_الجوال.toString().replace(/^0+/, '')}" 
+                                   target="_blank" class="whatsapp-btn">
+                                    <i class="fab fa-whatsapp"></i>
+                                    إرسال
+                                </a>
+                            ` : 'غير متوفر'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updatePagination();
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button onclick="changePage(${currentPage - 1})">السابق</button>`;
+            }
+            
+            // Page numbers
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                paginationHTML += `<button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>${i}</button>`;
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button onclick="changePage(${currentPage + 1})">التالي</button>`;
+            }
+            
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // Change page
+        function changePage(page) {
+            currentPage = page;
+            displayResidents();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                filterData();
+            });
+
+            // Unit type filter
+            document.getElementById('unitTypeFilter').addEventListener('change', function() {
+                filterData();
+            });
+        }
+
+        // Filter data
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const unitTypeFilter = document.getElementById('unitTypeFilter').value;
+
+            filteredData = residentsData.filter(resident => {
+                const matchesSearch = !searchTerm || 
+                    (resident.الاسم && resident.الاسم.toLowerCase().includes(searchTerm)) ||
+                    (resident.الوحدة_السكنية && resident.الوحدة_السكنية.toLowerCase().includes(searchTerm)) ||
+                    (resident.رقم_الهوية && resident.رقم_الهوية.toString().includes(searchTerm)) ||
+                    (resident.رقم_الجوال && resident.رقم_الجوال.toString().includes(searchTerm));
+
+                const matchesUnitType = !unitTypeFilter || getUnitType(resident.الوحدة_السكنية) === unitTypeFilter;
+
+                return matchesSearch && matchesUnitType;
+            });
+
+            currentPage = 1;
+            displayResidents();
+        }
+
+        // Refresh data
+        function refreshData() {
+            location.reload();
+        }
+
+        // Generate reports
+        function generateReport(type) {
+            const reportData = {
+                type: type,
+                date: new Date().toLocaleDateString('ar-SA'),
+                totalResidents: residentsData.length,
+                villaResidents: residentsData.filter(r => isVilla(r.الوحدة_السكنية)).length,
+                apartmentResidents: residentsData.filter(r => !isVilla(r.الوحدة_السكنية)).length
+            };
+
+            let reportTitle = '';
+            switch(type) {
+                case 'daily': reportTitle = 'التقرير اليومي'; break;
+                case 'weekly': reportTitle = 'التقرير الأسبوعي'; break;
+                case 'monthly': reportTitle = 'التقرير الشهري'; break;
+            }
+
+            alert(`${reportTitle}\n\nإجمالي السكان: ${reportData.totalResidents}\nسكان الفلل: ${reportData.villaResidents}\nسكان الشقق: ${reportData.apartmentResidents}\n\nتاريخ التقرير: ${reportData.date}`);
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "الاسم,الوحدة السكنية,نوع الوحدة,رقم الهوية,رقم الجوال\n" +
+                residentsData.map(r => 
+                    `"${r.الاسم}","${r.الوحدة_السكنية}","${getUnitType(r.الوحدة_السكنية)}","${r.رقم_الهوية}","${r.رقم_الجوال}"`
+                ).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `بيانات_السكان_${new Date().toLocaleDateString('ar-SA')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Send bulk WhatsApp
+        function sendBulkWhatsApp() {
+            const message = document.getElementById('whatsappMessage').value;
+            if (!message.trim()) {
+                alert('يرجى كتابة رسالة أولاً');
+                return;
+            }
+
+            const phoneNumbers = residentsData
+                .filter(r => r.رقم_الجوال)
+                .map(r => r.رقم_الجوال.toString().replace(/^0+/, ''));
+
+            if (phoneNumbers.length === 0) {
+                alert('لا توجد أرقام جوال متاحة');
+                return;
+            }
+
+            const encodedMessage = encodeURIComponent(message);
+            phoneNumbers.forEach((phone, index) => {
+                setTimeout(() => {
+                    window.open(`https://wa.me/966${phone}?text=${encodedMessage}`, '_blank');
+                }, index * 1000); // تأخير ثانية واحدة بين كل رسالة
+            });
+        }
+
+        // Send filtered WhatsApp
+        function sendFilteredWhatsApp() {
+            const message = document.getElementById('whatsappMessage').value;
+            if (!message.trim()) {
+                alert('يرجى كتابة رسالة أولاً');
+                return;
+            }
+
+            const phoneNumbers = filteredData
+                .filter(r => r.رقم_الجوال)
+                .map(r => r.رقم_الجوال.toString().replace(/^0+/, ''));
+
+            if (phoneNumbers.length === 0) {
+                alert('لا توجد أرقام جوال متاحة في النتائج المعروضة');
+                return;
+            }
+
+            const encodedMessage = encodeURIComponent(message);
+            phoneNumbers.forEach((phone, index) => {
+                setTimeout(() => {
+                    window.open(`https://wa.me/966${phone}?text=${encodedMessage}`, '_blank');
+                }, index * 1000);
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadResidentsData();
+        });
+    </script>
+</body>
+</html>
+

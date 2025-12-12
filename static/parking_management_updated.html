@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المواقف - إسكان أعضاء هيئة التدريس</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            padding: 10px;
+        }
+
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s ease;
+        }
+
+        .data-table tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-available {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .status-occupied {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .status-reserved {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .status-maintenance {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .unit-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .unit-villa {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .unit-apartment {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .complaint-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .reports-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .report-card:hover {
+            transform: translateY(-3px);
+            border-color: #2a5298;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .report-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #2a5298;
+        }
+
+        .report-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        .pagination button.active {
+            background: #2a5298;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .special-needs {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-info">
+                    <h1 class="header-title">
+                        <i class="fas fa-parking"></i>
+                        إدارة المواقف
+                        <img src="IMG_1093.png" alt="شعار الجامعة" class="logo">
+                    </h1>
+                    <p class="header-subtitle">نظام إدارة المواقف والشكاوى وتعهدات السكان</p>
+                </div>
+                <a href="dashboard.html" class="back-button">
+                    <i class="fas fa-home"></i>
+                    العودة للوحة التحكم
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #2a5298;">
+                    <i class="fas fa-parking"></i>
+                </div>
+                <div class="stat-number" style="color: #2a5298;" id="totalParkings">0</div>
+                <div class="stat-label">إجمالي المواقف</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #28a745;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number" style="color: #28a745;" id="availableParkings">0</div>
+                <div class="stat-label">المواقف المتاحة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #dc3545;">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-number" style="color: #dc3545;" id="occupiedParkings">0</div>
+                <div class="stat-label">المواقف المشغولة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #17a2b8;">
+                    <i class="fas fa-wheelchair"></i>
+                </div>
+                <div class="stat-number" style="color: #17a2b8;" id="specialNeedsParkings">18</div>
+                <div class="stat-label">مواقف ذوي الاحتياجات الخاصة</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <h2 class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                توزيع المواقف حسب نوع الوحدة
+            </h2>
+            <div style="max-width: 400px; margin: 0 auto;">
+                <canvas id="parkingChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="reports-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                التقارير والإحصائيات
+            </h2>
+            <div class="reports-grid">
+                <div class="report-card" onclick="generateReport('daily')">
+                    <div class="report-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="report-title">تقرير يومي</div>
+                </div>
+                <div class="report-card" onclick="generateReport('weekly')">
+                    <div class="report-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="report-title">تقرير أسبوعي</div>
+                </div>
+                <div class="report-card" onclick="generateReport('monthly')">
+                    <div class="report-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="report-title">تقرير شهري</div>
+                </div>
+                <div class="report-card" onclick="exportToExcel()">
+                    <div class="report-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div class="report-title">تصدير Excel</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('parkings')">
+                    <i class="fas fa-parking"></i>
+                    المواقف
+                </button>
+                <button class="tab" onclick="showTab('complaints')">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    الشكاوى
+                </button>
+                <button class="tab" onclick="showTab('violations')">
+                    <i class="fas fa-ban"></i>
+                    المخالفات والتعهدات
+                </button>
+            </div>
+
+            <!-- Parkings Tab -->
+            <div id="parkings" class="tab-content active">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    قائمة المواقف
+                </h2>
+                
+                <!-- Controls -->
+                <div class="controls">
+                    <input type="text" class="search-box" id="parkingSearchInput" placeholder="البحث برقم الموقف أو المبنى أو الشقة...">
+                    <select class="filter-select" id="unitTypeFilter">
+                        <option value="">جميع أنواع الوحدات</option>
+                        <option value="فيلا">الفلل فقط</option>
+                        <option value="شقة">الشقق فقط</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">جميع الحالات</option>
+                        <option value="متاح">متاح</option>
+                        <option value="مشغول">مشغول</option>
+                        <option value="محجوز">محجوز</option>
+                        <option value="صيانة">صيانة</option>
+                    </select>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="refreshParkingData()">
+                            <i class="fas fa-sync-alt"></i>
+                            تحديث البيانات
+                        </button>
+                        <button class="btn btn-success" onclick="addNewParking()">
+                            <i class="fas fa-plus"></i>
+                            إضافة موقف
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>معرف الموقف</th>
+                                <th>رقم الموقف</th>
+                                <th>نوع الوحدة</th>
+                                <th>المبنى</th>
+                                <th>الشقة</th>
+                                <th>مربع الوقوف</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parkingTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    جاري تحميل البيانات...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="parkingPagination"></div>
+            </div>
+
+            <!-- Complaints Tab -->
+            <div id="complaints" class="tab-content">
+                <h2 class="section-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    إدارة الشكاوى
+                </h2>
+
+                <!-- Add Complaint Form -->
+                <div class="complaint-form">
+                    <h3 style="margin-bottom: 20px; color: #1e3c72;">
+                        <i class="fas fa-plus"></i>
+                        إضافة شكوى جديدة
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">رقم الموقف</label>
+                            <input type="text" class="form-input" id="complaintParkingId" placeholder="أدخل رقم الموقف">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">اسم الساكن</label>
+                            <input type="text" class="form-input" id="complaintResidentName" placeholder="أدخل اسم الساكن">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">نوع الشكوى</label>
+                            <select class="form-input" id="complaintType">
+                                <option value="">اختر نوع الشكوى</option>
+                                <option value="موقف مشغول بدون تصريح">موقف مشغول بدون تصريح</option>
+                                <option value="سيارة متروكة">سيارة متروكة</option>
+                                <option value="إعاقة حركة المرور">إعاقة حركة المرور</option>
+                                <option value="تلف في الموقف">تلف في الموقف</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label">تفاصيل الشكوى</label>
+                            <textarea class="form-textarea" id="complaintDetails" placeholder="اكتب تفاصيل الشكوى هنا..."></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitComplaint()">
+                        <i class="fas fa-paper-plane"></i>
+                        إرسال الشكوى
+                    </button>
+                </div>
+
+                <!-- Complaints List -->
+                <div class="controls">
+                    <input type="text" class="search-box" id="complaintSearchInput" placeholder="البحث في الشكاوى...">
+                    <select class="filter-select" id="complaintStatusFilter">
+                        <option value="">جميع الحالات</option>
+                        <option value="جديدة">جديدة</option>
+                        <option value="قيد المراجعة">قيد المراجعة</option>
+                        <option value="تم الحل">تم الحل</option>
+                        <option value="مرفوضة">مرفوضة</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الشكوى</th>
+                                <th>رقم الموقف</th>
+                                <th>اسم الساكن</th>
+                                <th>نوع الشكوى</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="complaintsTableBody">
+                            <tr>
+                                <td colspan="7" class="loading">
+                                    <i class="fas fa-info-circle"></i>
+                                    لا توجد شكاوى مسجلة حالياً
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Violations Tab -->
+            <div id="violations" class="tab-content">
+                <h2 class="section-title">
+                    <i class="fas fa-ban"></i>
+                    المخالفات والتعهدات
+                </h2>
+
+                <!-- Add Violation Form -->
+                <div class="complaint-form">
+                    <h3 style="margin-bottom: 20px; color: #1e3c72;">
+                        <i class="fas fa-plus"></i>
+                        تسجيل مخالفة جديدة
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">رقم الموقف</label>
+                            <input type="text" class="form-input" id="violationParkingId" placeholder="أدخل رقم الموقف">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">اسم الساكن المخالف</label>
+                            <input type="text" class="form-input" id="violationResidentName" placeholder="أدخل اسم الساكن">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">نوع المخالفة</label>
+                            <select class="form-input" id="violationType">
+                                <option value="">اختر نوع المخالفة</option>
+                                <option value="وقوف في موقف غير مخصص">وقوف في موقف غير مخصص</option>
+                                <option value="وقوف في موقف ذوي الاحتياجات الخاصة">وقوف في موقف ذوي الاحتياجات الخاصة</option>
+                                <option value="إعاقة حركة المرور">إعاقة حركة المرور</option>
+                                <option value="وقوف مزدوج">وقوف مزدوج</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">مبلغ الغرامة (ريال)</label>
+                            <input type="number" class="form-input" id="violationFine" placeholder="أدخل مبلغ الغرامة">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label">تفاصيل المخالفة</label>
+                            <textarea class="form-textarea" id="violationDetails" placeholder="اكتب تفاصيل المخالفة هنا..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label">نص التعهد</label>
+                            <textarea class="form-textarea" id="violationCommitment" placeholder="اكتب نص التعهد المطلوب من الساكن...">أتعهد بعدم تكرار هذه المخالفة والالتزام بقوانين المواقف في الإسكان، وأتحمل المسؤولية الكاملة في حالة التكرار.</textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="submitViolation()">
+                        <i class="fas fa-gavel"></i>
+                        تسجيل المخالفة
+                    </button>
+                </div>
+
+                <!-- Violations List -->
+                <div class="controls">
+                    <input type="text" class="search-box" id="violationSearchInput" placeholder="البحث في المخالفات...">
+                    <select class="filter-select" id="violationStatusFilter">
+                        <option value="">جميع الحالات</option>
+                        <option value="نشطة">نشطة</option>
+                        <option value="تم السداد">تم السداد</option>
+                        <option value="تم التعهد">تم التعهد</option>
+                        <option value="ملغاة">ملغاة</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم المخالفة</th>
+                                <th>رقم الموقف</th>
+                                <th>اسم الساكن</th>
+                                <th>نوع المخالفة</th>
+                                <th>مبلغ الغرامة</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="violationsTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">
+                                    <i class="fas fa-info-circle"></i>
+                                    لا توجد مخالفات مسجلة حالياً
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let parkingData = [];
+        let complaintsData = [];
+        let violationsData = [];
+        let filteredParkingData = [];
+        let currentPage = 1;
+        const itemsPerPage = 50;
+
+        // Load parking data
+        async function loadParkingData() {
+            try {
+                const response = await fetch('parking_data.json');
+                parkingData = await response.json();
+                filteredParkingData = [...parkingData];
+                
+                updateStatistics();
+                updateChart();
+                displayParkings();
+                setupEventListeners();
+                
+                console.log('تم تحميل بيانات المواقف:', parkingData.length, 'موقف');
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                document.getElementById('parkingTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" style="color: red; text-align: center;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            خطأ في تحميل البيانات
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const total = parkingData.length;
+            const apartments = parkingData.filter(p => p['نوع الوحدة السكنية'] === 'شقة').length;
+            const villas = total - apartments;
+            
+            // افتراض أن 80% من المواقف متاحة و 20% مشغولة
+            const available = Math.floor(total * 0.8);
+            const occupied = total - available;
+
+            document.getElementById('totalParkings').textContent = total.toLocaleString();
+            document.getElementById('availableParkings').textContent = available.toLocaleString();
+            document.getElementById('occupiedParkings').textContent = occupied.toLocaleString();
+        }
+
+        // Update chart
+        function updateChart() {
+            const apartments = parkingData.filter(p => p['نوع الوحدة السكنية'] === 'شقة').length;
+            const villas = parkingData.length - apartments;
+
+            const ctx = document.getElementById('parkingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['مواقف الشقق', 'مواقف الفلل'],
+                    datasets: [{
+                        data: [apartments, villas],
+                        backgroundColor: [
+                            '#007bff',
+                            '#28a745'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Tajawal',
+                                    size: 14
+                                },
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Display parkings
+        function displayParkings() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredParkingData.slice(startIndex, endIndex);
+
+            const tbody = document.getElementById('parkingTableBody');
+            
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #666;">
+                            <i class="fas fa-search"></i>
+                            لا توجد نتائج مطابقة للبحث
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(parking => {
+                const unitType = parking['نوع الوحدة السكنية'];
+                const unitClass = unitType === 'فيلا' ? 'unit-villa' : 'unit-apartment';
+                const unitIcon = unitType === 'فيلا' ? 'fas fa-home' : 'fas fa-building';
+                
+                // تحديد حالة الموقف (افتراضية)
+                const statuses = ['متاح', 'مشغول', 'محجوز'];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                const statusClass = randomStatus === 'متاح' ? 'status-available' : 
+                                 randomStatus === 'مشغول' ? 'status-occupied' : 'status-reserved';
+                
+                // تحديد إذا كان موقف ذوي احتياجات خاصة (18 موقف في المباني القديمة)
+                const isSpecialNeeds = parking['المبنى'] <= 10 && Math.random() < 0.02; // 2% احتمال
+                
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${parking['معرف الموقف'] || 'غير محدد'}</td>
+                        <td style="font-family: monospace;">${parking['رقم الموقف'] || 'غير محدد'}</td>
+                        <td>
+                            <span class="unit-badge ${unitClass}">
+                                <i class="${unitIcon}"></i>
+                                ${unitType}
+                            </span>
+                        </td>
+                        <td>${parking['المبنى'] || 'غير محدد'}</td>
+                        <td>${parking['الشقة'] || 'غير محدد'}</td>
+                        <td style="font-size: 0.9rem;">${parking['مربع الوقوف'] || 'غير محدد'}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                ${randomStatus}
+                            </span>
+                            ${isSpecialNeeds ? '<br><span class="special-needs"><i class="fas fa-wheelchair"></i> احتياجات خاصة</span>' : ''}
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="editParking(${parking['معرف الموقف']})">
+                                <i class="fas fa-edit"></i>
+                                تعديل
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updatePagination();
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredParkingData.length / itemsPerPage);
+            const pagination = document.getElementById('parkingPagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            if (currentPage > 1) {
+                paginationHTML += `<button onclick="changePage(${currentPage - 1})">السابق</button>`;
+            }
+            
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                paginationHTML += `<button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>${i}</button>`;
+            }
+            
+            if (currentPage < totalPages) {
+                paginationHTML += `<button onclick="changePage(${currentPage + 1})">التالي</button>`;
+            }
+            
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // Change page
+        function changePage(page) {
+            currentPage = page;
+            displayParkings();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('parkingSearchInput').addEventListener('input', filterParkingData);
+            document.getElementById('unitTypeFilter').addEventListener('change', filterParkingData);
+            document.getElementById('statusFilter').addEventListener('change', filterParkingData);
+        }
+
+        // Filter parking data
+        function filterParkingData() {
+            const searchTerm = document.getElementById('parkingSearchInput').value.toLowerCase().trim();
+            const unitTypeFilter = document.getElementById('unitTypeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            filteredParkingData = parkingData.filter(parking => {
+                const matchesSearch = !searchTerm || 
+                    (parking['رقم الموقف'] && parking['رقم الموقف'].toString().toLowerCase().includes(searchTerm)) ||
+                    (parking['المبنى'] && parking['المبنى'].toString().includes(searchTerm)) ||
+                    (parking['الشقة'] && parking['الشقة'].toString().includes(searchTerm));
+
+                const matchesUnitType = !unitTypeFilter || parking['نوع الوحدة السكنية'] === unitTypeFilter;
+
+                return matchesSearch && matchesUnitType;
+            });
+
+            currentPage = 1;
+            displayParkings();
+        }
+
+        // Show tab
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Refresh parking data
+        function refreshParkingData() {
+            location.reload();
+        }
+
+        // Add new parking
+        function addNewParking() {
+            alert('ميزة إضافة موقف جديد ستكون متاحة قريباً');
+        }
+
+        // Edit parking
+        function editParking(id) {
+            alert(`تعديل الموقف رقم ${id} - ستكون هذه الميزة متاحة قريباً`);
+        }
+
+        // Submit complaint
+        function submitComplaint() {
+            const parkingId = document.getElementById('complaintParkingId').value;
+            const residentName = document.getElementById('complaintResidentName').value;
+            const type = document.getElementById('complaintType').value;
+            const details = document.getElementById('complaintDetails').value;
+
+            if (!parkingId || !residentName || !type || !details) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            // إضافة الشكوى إلى القائمة
+            const complaint = {
+                id: Date.now(),
+                parkingId: parkingId,
+                residentName: residentName,
+                type: type,
+                details: details,
+                date: new Date().toLocaleDateString('ar-SA'),
+                status: 'جديدة'
+            };
+
+            complaintsData.push(complaint);
+            displayComplaints();
+
+            // مسح النموذج
+            document.getElementById('complaintParkingId').value = '';
+            document.getElementById('complaintResidentName').value = '';
+            document.getElementById('complaintType').value = '';
+            document.getElementById('complaintDetails').value = '';
+
+            alert('تم إرسال الشكوى بنجاح');
+        }
+
+        // Submit violation
+        function submitViolation() {
+            const parkingId = document.getElementById('violationParkingId').value;
+            const residentName = document.getElementById('violationResidentName').value;
+            const type = document.getElementById('violationType').value;
+            const fine = document.getElementById('violationFine').value;
+            const details = document.getElementById('violationDetails').value;
+            const commitment = document.getElementById('violationCommitment').value;
+
+            if (!parkingId || !residentName || !type || !fine || !details) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            // إضافة المخالفة إلى القائمة
+            const violation = {
+                id: Date.now(),
+                parkingId: parkingId,
+                residentName: residentName,
+                type: type,
+                fine: fine,
+                details: details,
+                commitment: commitment,
+                date: new Date().toLocaleDateString('ar-SA'),
+                status: 'نشطة'
+            };
+
+            violationsData.push(violation);
+            displayViolations();
+
+            // مسح النموذج
+            document.getElementById('violationParkingId').value = '';
+            document.getElementById('violationResidentName').value = '';
+            document.getElementById('violationType').value = '';
+            document.getElementById('violationFine').value = '';
+            document.getElementById('violationDetails').value = '';
+
+            alert('تم تسجيل المخالفة بنجاح');
+        }
+
+        // Display complaints
+        function displayComplaints() {
+            const tbody = document.getElementById('complaintsTableBody');
+            
+            if (complaintsData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="loading">
+                            <i class="fas fa-info-circle"></i>
+                            لا توجد شكاوى مسجلة حالياً
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = complaintsData.map(complaint => `
+                <tr>
+                    <td style="font-weight: 600;">${complaint.id}</td>
+                    <td>${complaint.parkingId}</td>
+                    <td>${complaint.residentName}</td>
+                    <td>${complaint.type}</td>
+                    <td>${complaint.date}</td>
+                    <td>
+                        <span class="status-badge status-available">
+                            ${complaint.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;">
+                            <i class="fas fa-eye"></i>
+                            عرض
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Display violations
+        function displayViolations() {
+            const tbody = document.getElementById('violationsTableBody');
+            
+            if (violationsData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="fas fa-info-circle"></i>
+                            لا توجد مخالفات مسجلة حالياً
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = violationsData.map(violation => `
+                <tr>
+                    <td style="font-weight: 600;">${violation.id}</td>
+                    <td>${violation.parkingId}</td>
+                    <td>${violation.residentName}</td>
+                    <td>${violation.type}</td>
+                    <td style="font-weight: 600; color: #dc3545;">${violation.fine} ريال</td>
+                    <td>${violation.date}</td>
+                    <td>
+                        <span class="status-badge status-occupied">
+                            ${violation.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;">
+                            <i class="fas fa-eye"></i>
+                            عرض
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Generate reports
+        function generateReport(type) {
+            const reportData = {
+                type: type,
+                date: new Date().toLocaleDateString('ar-SA'),
+                totalParkings: parkingData.length,
+                apartmentParkings: parkingData.filter(p => p['نوع الوحدة السكنية'] === 'شقة').length,
+                villaParkings: parkingData.filter(p => p['نوع الوحدة السكنية'] === 'فيلا').length,
+                complaints: complaintsData.length,
+                violations: violationsData.length
+            };
+
+            let reportTitle = '';
+            switch(type) {
+                case 'daily': reportTitle = 'التقرير اليومي'; break;
+                case 'weekly': reportTitle = 'التقرير الأسبوعي'; break;
+                case 'monthly': reportTitle = 'التقرير الشهري'; break;
+            }
+
+            alert(`${reportTitle}\n\nإجمالي المواقف: ${reportData.totalParkings}\nمواقف الشقق: ${reportData.apartmentParkings}\nمواقف الفلل: ${reportData.villaParkings}\nالشكاوى: ${reportData.complaints}\nالمخالفات: ${reportData.violations}\n\nتاريخ التقرير: ${reportData.date}`);
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "معرف الموقف,رقم الموقف,نوع الوحدة,المبنى,الشقة,مربع الوقوف\n" +
+                parkingData.map(p => 
+                    `"${p['معرف الموقف']}","${p['رقم الموقف']}","${p['نوع الوحدة السكنية']}","${p['المبنى']}","${p['الشقة']}","${p['مربع الوقوف']}"`
+                ).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `بيانات_المواقف_${new Date().toLocaleDateString('ar-SA')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadParkingData();
+            displayComplaints();
+            displayViolations();
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل المخالفات المرورية - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Tajawal:700,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: linear-gradient(120deg, #e0e7ef 0%, #f7fcff 100%);
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #0f3d68 60%, #2e8bc0 100%);
+      color: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 6px 16px rgba(15, 61, 104, 0.2);
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      margin: 10px 0 0 0;
+      opacity: 0.9;
+    }
+
+    .quick-action-card {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 30px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+    }
+
+    .quick-action-card h3 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+    }
+
+    .quick-action-card p {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .quick-violation-btn {
+      background: white;
+      color: #ff6b6b;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 25px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .quick-violation-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #0f3d68;
+      border-bottom: 2px solid #e3f2fd;
+      padding-bottom: 10px;
+    }
+
+    .violation-form {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 15px;
+    }
+
+    .btn-primary {
+      background: #0f3d68;
+      border-color: #0f3d68;
+      border-radius: 8px;
+      padding: 10px 25px;
+    }
+
+    .btn-primary:hover {
+      background: #2e8bc0;
+      border-color: #2e8bc0;
+    }
+
+    .violation-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 5px solid #ff6b6b;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .violation-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .violation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .violation-id {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #0f3d68;
+    }
+
+    .violation-status {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+
+    .status-open {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .status-paid {
+      background: #28a745;
+      color: white;
+    }
+
+    .violation-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 5px;
+    }
+
+    .detail-value {
+      color: #333;
+      font-size: 1em;
+    }
+
+    .violation-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 8px 15px;
+      border-radius: 5px;
+      border: none;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-pay {
+      background: #28a745;
+      color: white;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-export {
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-export:hover {
+      background: #138496;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 1.1em;
+    }
+
+    .stat-violations .stat-number { color: #ff6b6b; }
+    .stat-paid .stat-number { color: #28a745; }
+    .stat-amount .stat-number { color: #ffc107; }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.8em;
+      }
+      
+      .violation-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .violation-actions {
+        margin-top: 10px;
+        width: 100%;
+      }
+      
+      .export-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="container">
+      <h1><i class="fas fa-exclamation-triangle"></i> تسجيل المخالفات المرورية</h1>
+      <p>نظام إدارة إسكان أعضاء هيئة التدريس - جامعة الإمام محمد بن سعود الإسلامية</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- بطاقة الإجراء السريع -->
+    <div class="quick-action-card">
+      <h3><i class="fas fa-plus-circle"></i> تسجيل مخالفة مرورية جديدة</h3>
+      <p>سجل المخالفات المرورية بسرعة وسهولة</p>
+      <button class="quick-violation-btn" onclick="showViolationForm()">
+        <i class="fas fa-plus"></i> تسجيل مخالفة الآن
+      </button>
+    </div>
+
+    <!-- الإحصائيات -->
+    <div class="stats-grid">
+      <div class="stat-card stat-violations">
+        <div class="stat-number" id="totalViolations">0</div>
+        <div class="stat-label">إجمالي المخالفات</div>
+      </div>
+      <div class="stat-card stat-violations">
+        <div class="stat-number" id="openViolations">0</div>
+        <div class="stat-label">مخالفات مفتوحة</div>
+      </div>
+      <div class="stat-card stat-paid">
+        <div class="stat-number" id="paidViolations">0</div>
+        <div class="stat-label">مخالفات مدفوعة</div>
+      </div>
+      <div class="stat-card stat-amount">
+        <div class="stat-number" id="totalAmount">0</div>
+        <div class="stat-label">إجمالي المبالغ (ريال)</div>
+      </div>
+    </div>
+
+    <!-- أزرار التصدير -->
+    <div class="content-section">
+      <div class="export-buttons">
+        <button class="btn-export" onclick="exportViolationsToPDF()">
+          <i class="fas fa-file-pdf"></i> تصدير PDF
+        </button>
+        <button class="btn-export" onclick="exportViolationsToExcel()">
+          <i class="fas fa-file-excel"></i> تصدير Excel
+        </button>
+        <button class="btn btn-info" onclick="generateReport()">
+          <i class="fas fa-chart-bar"></i> تقرير شامل
+        </button>
+      </div>
+    </div>
+
+    <!-- نموذج تسجيل مخالفة جديدة -->
+    <div class="content-section" id="violationFormSection" style="display: none;">
+      <h3 class="section-title"><i class="fas fa-plus"></i> تسجيل مخالفة جديدة</h3>
+      <div class="violation-form">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="plateNumber" class="form-label">رقم اللوحة</label>
+            <input type="text" class="form-control" id="plateNumber" placeholder="أدخل رقم اللوحة">
+          </div>
+          <div class="col-md-6">
+            <label for="violationType" class="form-label">نوع المخالفة</label>
+            <select class="form-select" id="violationType">
+              <option value="">اختر نوع المخالفة</option>
+              <option value="parking">مخالفة وقوف</option>
+              <option value="speed">تجاوز السرعة</option>
+              <option value="wrong_direction">اتجاه خاطئ</option>
+              <option value="no_permit">عدم وجود تصريح</option>
+              <option value="expired_permit">تصريح منتهي الصلاحية</option>
+              <option value="other">أخرى</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="violationDate" class="form-label">تاريخ المخالفة</label>
+            <input type="date" class="form-control" id="violationDate">
+          </div>
+          <div class="col-md-6">
+            <label for="violationTime" class="form-label">وقت المخالفة</label>
+            <input type="time" class="form-control" id="violationTime">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="location" class="form-label">الموقع</label>
+            <input type="text" class="form-control" id="location" placeholder="موقع المخالفة">
+          </div>
+          <div class="col-md-6">
+            <label for="amount" class="form-label">مبلغ الغرامة (ريال)</label>
+            <input type="number" class="form-control" id="amount" placeholder="0">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="officerName" class="form-label">اسم المسؤول</label>
+            <input type="text" class="form-control" id="officerName" placeholder="اسم المسؤول عن التسجيل">
+          </div>
+          <div class="col-md-6">
+            <label for="residentName" class="form-label">اسم الساكن (اختياري)</label>
+            <input type="text" class="form-control" id="residentName" placeholder="اسم الساكن">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">وصف المخالفة</label>
+          <textarea class="form-control" id="description" rows="3" placeholder="تفاصيل إضافية عن المخالفة"></textarea>
+        </div>
+        
+        <div class="mt-3">
+          <button class="btn btn-primary" onclick="addViolation()">
+            <i class="fas fa-save"></i> حفظ المخالفة
+          </button>
+          <button class="btn btn-secondary" onclick="hideViolationForm()">
+            <i class="fas fa-times"></i> إلغاء
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- قائمة المخالفات -->
+    <div class="content-section">
+      <h3 class="section-title"><i class="fas fa-list"></i> قائمة المخالفات المرورية</h3>
+      <div id="violationsList">
+        <!-- سيتم ملء البيانات هنا -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF للتصدير -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- SheetJS للتصدير إلى Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- مكتبة المرافق -->
+  <script src="export_utils.js"></script>
+
+  <script>
+    // إدارة المخالفات باستخدام CRUDManager
+    const violationsManager = new CRUDManager('traffic_violations', 'المخالفات المرورية');
+
+    // بيانات المخالفات الأولية
+    if (violationsManager.readAll().length === 0) {
+      const initialViolations = [
+        {
+          plateNumber: 'أ ب ج 1234',
+          violationType: 'parking',
+          violationDate: '2025-01-25',
+          violationTime: '14:30',
+          location: 'موقف المبنى الأول',
+          amount: 100,
+          officerName: 'أحمد محمد',
+          residentName: 'د. محمد العتيبي',
+          description: 'وقوف في مكان محظور',
+          status: 'open'
+        },
+        {
+          plateNumber: 'د هـ و 5678',
+          violationType: 'no_permit',
+          violationDate: '2025-01-26',
+          violationTime: '09:15',
+          location: 'مدخل الإسكان',
+          amount: 200,
+          officerName: 'سالم أحمد',
+          residentName: 'د. فاطمة الزهراني',
+          description: 'دخول بدون تصريح',
+          status: 'paid'
+        },
+        {
+          plateNumber: 'ز ح ط 9012',
+          violationType: 'speed',
+          violationDate: '2025-01-27',
+          violationTime: '16:45',
+          location: 'الشارع الرئيسي',
+          amount: 150,
+          officerName: 'خالد سعد',
+          residentName: 'د. عبدالله القحطاني',
+          description: 'تجاوز السرعة المحددة',
+          status: 'open'
+        }
+      ];
+
+      initialViolations.forEach(violation => violationsManager.create(violation));
+    }
+
+    // تحميل المخالفات وتحديث الإحصائيات
+    function loadViolations() {
+      const violations = violationsManager.readAll();
+      updateStatistics(violations);
+      displayViolations(violations);
+    }
+
+    // تحديث الإحصائيات
+    function updateStatistics(violations) {
+      const totalViolations = violations.length;
+      const openViolations = violations.filter(v => v.status === 'open').length;
+      const paidViolations = violations.filter(v => v.status === 'paid').length;
+      const totalAmount = violations.reduce((sum, v) => sum + (v.amount || 0), 0);
+
+      document.getElementById('totalViolations').textContent = totalViolations;
+      document.getElementById('openViolations').textContent = openViolations;
+      document.getElementById('paidViolations').textContent = paidViolations;
+      document.getElementById('totalAmount').textContent = totalAmount.toLocaleString();
+    }
+
+    // عرض المخالفات
+    function displayViolations(violations) {
+      const violationsList = document.getElementById('violationsList');
+      
+      if (violations.length === 0) {
+        violationsList.innerHTML = '<p class="text-center text-muted">لا توجد مخالفات مسجلة</p>';
+        return;
+      }
+
+      violationsList.innerHTML = violations.map(violation => `
+        <div class="violation-card">
+          <div class="violation-header">
+            <div class="violation-id">مخالفة #${violation.id.slice(-6)}</div>
+            <div class="violation-status ${violation.status === 'paid' ? 'status-paid' : 'status-open'}">
+              ${violation.status === 'paid' ? 'مدفوعة' : 'مفتوحة'}
+            </div>
+          </div>
+          
+          <div class="violation-details">
+            <div class="detail-item">
+              <div class="detail-label">رقم اللوحة</div>
+              <div class="detail-value">${violation.plateNumber}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">نوع المخالفة</div>
+              <div class="detail-value">${getViolationTypeText(violation.violationType)}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">التاريخ والوقت</div>
+              <div class="detail-value">${violation.violationDate} ${violation.violationTime}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">الموقع</div>
+              <div class="detail-value">${violation.location}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">المبلغ</div>
+              <div class="detail-value">${violation.amount} ريال</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">المسؤول</div>
+              <div class="detail-value">${violation.officerName}</div>
+            </div>
+            ${violation.residentName ? `
+            <div class="detail-item">
+              <div class="detail-label">الساكن</div>
+              <div class="detail-value">${violation.residentName}</div>
+            </div>
+            ` : ''}
+          </div>
+          
+          ${violation.description ? `
+          <div class="mb-3">
+            <div class="detail-label">الوصف</div>
+            <div class="detail-value">${violation.description}</div>
+          </div>
+          ` : ''}
+          
+          <div class="violation-actions">
+            <button class="action-btn btn-edit" onclick="editViolation('${violation.id}')">
+              <i class="fas fa-edit"></i> تعديل
+            </button>
+            ${violation.status === 'open' ? `
+            <button class="action-btn btn-pay" onclick="markAsPaid('${violation.id}')">
+              <i class="fas fa-check"></i> تسديد
+            </button>
+            ` : ''}
+            <button class="action-btn btn-delete" onclick="deleteViolation('${violation.id}')">
+              <i class="fas fa-trash"></i> حذف
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // الحصول على نص نوع المخالفة
+    function getViolationTypeText(type) {
+      const types = {
+        'parking': 'مخالفة وقوف',
+        'speed': 'تجاوز السرعة',
+        'wrong_direction': 'اتجاه خاطئ',
+        'no_permit': 'عدم وجود تصريح',
+        'expired_permit': 'تصريح منتهي الصلاحية',
+        'other': 'أخرى'
+      };
+      return types[type] || type;
+    }
+
+    // إظهار نموذج المخالفة
+    function showViolationForm() {
+      document.getElementById('violationFormSection').style.display = 'block';
+      document.getElementById('violationFormSection').scrollIntoView({ behavior: 'smooth' });
+      
+      // تعيين التاريخ والوقت الحالي
+      const now = new Date();
+      document.getElementById('violationDate').value = now.toISOString().split('T')[0];
+      document.getElementById('violationTime').value = now.toTimeString().slice(0, 5);
+    }
+
+    // إخفاء نموذج المخالفة
+    function hideViolationForm() {
+      document.getElementById('violationFormSection').style.display = 'none';
+      clearViolationForm();
+    }
+
+    // مسح نموذج المخالفة
+    function clearViolationForm() {
+      document.getElementById('plateNumber').value = '';
+      document.getElementById('violationType').value = '';
+      document.getElementById('violationDate').value = '';
+      document.getElementById('violationTime').value = '';
+      document.getElementById('location').value = '';
+      document.getElementById('amount').value = '';
+      document.getElementById('officerName').value = '';
+      document.getElementById('residentName').value = '';
+      document.getElementById('description').value = '';
+    }
+
+    // إضافة مخالفة جديدة
+    function addViolation() {
+      const plateNumber = document.getElementById('plateNumber').value;
+      const violationType = document.getElementById('violationType').value;
+      const violationDate = document.getElementById('violationDate').value;
+      const violationTime = document.getElementById('violationTime').value;
+      const location = document.getElementById('location').value;
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      const officerName = document.getElementById('officerName').value;
+      const residentName = document.getElementById('residentName').value;
+      const description = document.getElementById('description').value;
+
+      if (!plateNumber || !violationType || !violationDate || !location || !officerName) {
+        alert('يرجى ملء جميع الحقول المطلوبة');
+        return;
+      }
+
+      const violation = {
+        plateNumber,
+        violationType,
+        violationDate,
+        violationTime,
+        location,
+        amount,
+        officerName,
+        residentName,
+        description,
+        status: 'open'
+      };
+
+      violationsManager.create(violation);
+      loadViolations();
+      hideViolationForm();
+      alert('تم تسجيل المخالفة بنجاح');
+    }
+
+    // تعديل مخالفة
+    function editViolation(id) {
+      const violation = violationsManager.readOne(id);
+      if (violation) {
+        // ملء النموذج بالبيانات الحالية
+        document.getElementById('plateNumber').value = violation.plateNumber;
+        document.getElementById('violationType').value = violation.violationType;
+        document.getElementById('violationDate').value = violation.violationDate;
+        document.getElementById('violationTime').value = violation.violationTime;
+        document.getElementById('location').value = violation.location;
+        document.getElementById('amount').value = violation.amount;
+        document.getElementById('officerName').value = violation.officerName;
+        document.getElementById('residentName').value = violation.residentName || '';
+        document.getElementById('description').value = violation.description || '';
+        
+        showViolationForm();
+        
+        // تغيير زر الحفظ للتحديث
+        const saveBtn = document.querySelector('#violationFormSection .btn-primary');
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> تحديث المخالفة';
+        saveBtn.onclick = () => updateViolation(id);
+      }
+    }
+
+    // تحديث مخالفة
+    function updateViolation(id) {
+      const updates = {
+        plateNumber: document.getElementById('plateNumber').value,
+        violationType: document.getElementById('violationType').value,
+        violationDate: document.getElementById('violationDate').value,
+        violationTime: document.getElementById('violationTime').value,
+        location: document.getElementById('location').value,
+        amount: parseFloat(document.getElementById('amount').value) || 0,
+        officerName: document.getElementById('officerName').value,
+        residentName: document.getElementById('residentName').value,
+        description: document.getElementById('description').value
+      };
+
+      violationsManager.update(id, updates);
+      loadViolations();
+      hideViolationForm();
+      
+      // إعادة تعيين زر الحفظ
+      const saveBtn = document.querySelector('#violationFormSection .btn-primary');
+      saveBtn.innerHTML = '<i class="fas fa-save"></i> حفظ المخالفة';
+      saveBtn.onclick = addViolation;
+      
+      alert('تم تحديث المخالفة بنجاح');
+    }
+
+    // حذف مخالفة
+    function deleteViolation(id) {
+      if (confirm('هل أنت متأكد من حذف هذه المخالفة؟')) {
+        violationsManager.delete(id);
+        loadViolations();
+        alert('تم حذف المخالفة بنجاح');
+      }
+    }
+
+    // تسديد مخالفة
+    function markAsPaid(id) {
+      if (confirm('هل تم تسديد هذه المخالفة؟')) {
+        violationsManager.update(id, { status: 'paid' });
+        loadViolations();
+        alert('تم تسديد المخالفة بنجاح');
+      }
+    }
+
+    // تصدير المخالفات إلى PDF
+    function exportViolationsToPDF() {
+      const violations = violationsManager.readAll();
+      ExportUtils.exportToPDF(violations, 'المخالفات المرورية', 'المخالفات_المرورية.pdf');
+    }
+
+    // تصدير المخالفات إلى Excel
+    function exportViolationsToExcel() {
+      const violations = violationsManager.readAll().map(v => ({
+        'رقم المخالفة': v.id.slice(-6),
+        'رقم اللوحة': v.plateNumber,
+        'نوع المخالفة': getViolationTypeText(v.violationType),
+        'التاريخ': v.violationDate,
+        'الوقت': v.violationTime,
+        'الموقع': v.location,
+        'المبلغ': v.amount,
+        'المسؤول': v.officerName,
+        'الساكن': v.residentName || '',
+        'الحالة': v.status === 'paid' ? 'مدفوعة' : 'مفتوحة',
+        'الوصف': v.description || ''
+      }));
+      
+      ExportUtils.exportToExcel(violations, 'المخالفات المرورية', 'المخالفات_المرورية.xlsx');
+    }
+
+    // إنشاء تقرير شامل
+    function generateReport() {
+      const violations = violationsManager.readAll();
+      const report = {
+        totalViolations: violations.length,
+        openViolations: violations.filter(v => v.status === 'open').length,
+        paidViolations: violations.filter(v => v.status === 'paid').length,
+        totalAmount: violations.reduce((sum, v) => sum + (v.amount || 0), 0),
+        violationsByType: {},
+        violationsByMonth: {}
+      };
+
+      // تجميع حسب النوع
+      violations.forEach(v => {
+        const type = getViolationTypeText(v.violationType);
+        report.violationsByType[type] = (report.violationsByType[type] || 0) + 1;
+      });
+
+      // تجميع حسب الشهر
+      violations.forEach(v => {
+        const month = v.violationDate.substring(0, 7);
+        report.violationsByMonth[month] = (report.violationsByMonth[month] || 0) + 1;
+      });
+
+      console.log('تقرير المخالفات:', report);
+      alert('تم إنشاء التقرير. تحقق من وحدة التحكم للتفاصيل.');
+    }
+
+    // تحميل البيانات عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+      loadViolations();
+    });
+  </script>
+</body>
+</html>
+

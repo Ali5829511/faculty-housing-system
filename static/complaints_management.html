@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الشكاوى والمتابعة - إسكان أعضاء هيئة التدريس</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .logo {
+            width: 50px;
+            height: 50px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .back-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .tabs-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: #34495e;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-button.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .total { color: #3498db; }
+        .pending { color: #f39c12; }
+        .resolved { color: #27ae60; }
+        .urgent { color: #e74c3c; }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .table-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #34495e;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-urgent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .priority-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-low {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-view {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-resolve {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .chart-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .tabs-header {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <div class="logo">
+                <i class="fas fa-comments"></i>
+            </div>
+            إدارة الشكاوى والمتابعة
+            <small style="font-size: 0.7rem; color: #666;">نظام إدارة الشكاوى والمتابعة والردود</small>
+        </h1>
+        <a href="dashboard.html" class="back-btn">
+            <i class="fas fa-arrow-right"></i>
+            العودة لوحة التحكم
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- إحصائيات الشكاوى -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-number total" id="totalComplaints">-</div>
+                <div class="stat-label">إجمالي الشكاوى</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number pending" id="pendingComplaints">-</div>
+                <div class="stat-label">الشكاوى المعلقة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon resolved">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number resolved" id="resolvedComplaints">-</div>
+                <div class="stat-label">الشكاوى المحلولة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon urgent">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-number urgent" id="urgentComplaints">-</div>
+                <div class="stat-label">الشكاوى العاجلة</div>
+            </div>
+        </div>
+
+        <!-- الرسم البياني -->
+        <div class="chart-section">
+            <h3><i class="fas fa-chart-bar"></i> إحصائيات الشكاوى الشهرية</h3>
+            <div class="chart-container">
+                <canvas id="complaintsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- التبويبات -->
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-button active" onclick="switchTab('complaints')">
+                    <i class="fas fa-list"></i>
+                    قائمة الشكاوى
+                </button>
+                <button class="tab-button" onclick="switchTab('new-complaint')">
+                    <i class="fas fa-plus"></i>
+                    شكوى جديدة
+                </button>
+                <button class="tab-button" onclick="switchTab('follow-up')">
+                    <i class="fas fa-search"></i>
+                    متابعة الشكاوى
+                </button>
+                <button class="tab-button" onclick="switchTab('reports')">
+                    <i class="fas fa-chart-line"></i>
+                    التقارير
+                </button>
+            </div>
+
+            <!-- تبويب قائمة الشكاوى -->
+            <div id="complaints-tab" class="tab-content active">
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3><i class="fas fa-list"></i> قائمة الشكاوى</h3>
+                        <span id="complaintsCount">عرض: 0 شكوى</span>
+                    </div>
+                    <div class="table-container">
+                        <table id="complaintsTable">
+                            <thead>
+                                <tr>
+                                    <th>رقم الشكوى</th>
+                                    <th>اسم المشتكي</th>
+                                    <th>نوع الشكوى</th>
+                                    <th>الأولوية</th>
+                                    <th>الحالة</th>
+                                    <th>تاريخ الإنشاء</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaintsTableBody">
+                                <tr>
+                                    <td colspan="7" class="loading">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        جاري تحميل البيانات...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب شكوى جديدة -->
+            <div id="new-complaint-tab" class="tab-content">
+                <div class="form-section">
+                    <h3><i class="fas fa-plus"></i> إضافة شكوى جديدة</h3>
+                    <form id="newComplaintForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="complainerName">اسم المشتكي</label>
+                                <input type="text" id="complainerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="complainerPhone">رقم الجوال</label>
+                                <input type="tel" id="complainerPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="complainerUnit">الوحدة السكنية</label>
+                                <input type="text" id="complainerUnit" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="complaintType">نوع الشكوى</label>
+                                <select id="complaintType" required>
+                                    <option value="">اختر نوع الشكوى</option>
+                                    <option value="صيانة">صيانة</option>
+                                    <option value="نظافة">نظافة</option>
+                                    <option value="أمن">أمن وسلامة</option>
+                                    <option value="مواقف">مواقف السيارات</option>
+                                    <option value="ضوضاء">ضوضاء</option>
+                                    <option value="خدمات">خدمات عامة</option>
+                                    <option value="أخرى">أخرى</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">الأولوية</label>
+                                <select id="priority" required>
+                                    <option value="">اختر الأولوية</option>
+                                    <option value="عالية">عالية</option>
+                                    <option value="متوسطة">متوسطة</option>
+                                    <option value="منخفضة">منخفضة</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="assignedTo">المسؤول عن المتابعة</label>
+                                <select id="assignedTo">
+                                    <option value="">اختر المسؤول</option>
+                                    <option value="إدارة الصيانة">إدارة الصيانة</option>
+                                    <option value="إدارة النظافة">إدارة النظافة</option>
+                                    <option value="إدارة الأمن">إدارة الأمن</option>
+                                    <option value="إدارة المواقف">إدارة المواقف</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="complaintDescription">وصف الشكوى</label>
+                            <textarea id="complaintDescription" placeholder="اكتب تفاصيل الشكوى هنا..." required></textarea>
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                حفظ الشكوى
+                            </button>
+                            <button type="reset" class="btn btn-warning">
+                                <i class="fas fa-undo"></i>
+                                إعادة تعيين
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- تبويب متابعة الشكاوى -->
+            <div id="follow-up-tab" class="tab-content">
+                <div class="form-section">
+                    <h3><i class="fas fa-search"></i> متابعة الشكاوى</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="searchComplaint">البحث برقم الشكوى أو اسم المشتكي</label>
+                            <input type="text" id="searchComplaint" placeholder="ادخل رقم الشكوى أو اسم المشتكي...">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterStatus">تصفية حسب الحالة</label>
+                            <select id="filterStatus">
+                                <option value="">جميع الحالات</option>
+                                <option value="معلقة">معلقة</option>
+                                <option value="قيد المعالجة">قيد المعالجة</option>
+                                <option value="محلولة">محلولة</option>
+                                <option value="مغلقة">مغلقة</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filterType">تصفية حسب النوع</label>
+                            <select id="filterType">
+                                <option value="">جميع الأنواع</option>
+                                <option value="صيانة">صيانة</option>
+                                <option value="نظافة">نظافة</option>
+                                <option value="أمن">أمن وسلامة</option>
+                                <option value="مواقف">مواقف السيارات</option>
+                                <option value="ضوضاء">ضوضاء</option>
+                                <option value="خدمات">خدمات عامة</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary" onclick="applyFilters()">
+                                <i class="fas fa-search"></i>
+                                تطبيق التصفية
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب التقارير -->
+            <div id="reports-tab" class="tab-content">
+                <div class="form-section">
+                    <h3><i class="fas fa-chart-line"></i> تقارير الشكاوى</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-success" onclick="generateDailyReport()">
+                                <i class="fas fa-calendar-day"></i>
+                                تقرير يومي
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-success" onclick="generateWeeklyReport()">
+                                <i class="fas fa-calendar-week"></i>
+                                تقرير أسبوعي
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-success" onclick="generateMonthlyReport()">
+                                <i class="fas fa-calendar-alt"></i>
+                                تقرير شهري
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-warning" onclick="exportComplaints()">
+                                <i class="fas fa-file-excel"></i>
+                                تصدير Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let complaintsData = [];
+        let filteredComplaints = [];
+        let chart = null;
+
+        // تحميل بيانات الشكاوى (بيانات تجريبية)
+        function loadComplaintsData() {
+            // بيانات تجريبية للشكاوى
+            complaintsData = [
+                {
+                    id: 'C001',
+                    name: 'أحمد محمد',
+                    phone: '0501234567',
+                    unit: 'فلة 15',
+                    type: 'صيانة',
+                    priority: 'عالية',
+                    status: 'معلقة',
+                    description: 'تسريب في المياه',
+                    assignedTo: 'إدارة الصيانة',
+                    createdDate: '2025-01-20',
+                    updatedDate: '2025-01-20'
+                },
+                {
+                    id: 'C002',
+                    name: 'فاطمة أحمد',
+                    phone: '0507654321',
+                    unit: 'عمارة 5 - شقة 3',
+                    type: 'نظافة',
+                    priority: 'متوسطة',
+                    status: 'قيد المعالجة',
+                    description: 'عدم تنظيف المنطقة المشتركة',
+                    assignedTo: 'إدارة النظافة',
+                    createdDate: '2025-01-19',
+                    updatedDate: '2025-01-20'
+                },
+                {
+                    id: 'C003',
+                    name: 'محمد علي',
+                    phone: '0509876543',
+                    unit: 'فلة 42',
+                    type: 'مواقف',
+                    priority: 'منخفضة',
+                    status: 'محلولة',
+                    description: 'مشكلة في موقف السيارة',
+                    assignedTo: 'إدارة المواقف',
+                    createdDate: '2025-01-18',
+                    updatedDate: '2025-01-19'
+                }
+            ];
+
+            filteredComplaints = [...complaintsData];
+            updateStatistics();
+            updateChart();
+            displayComplaints();
+        }
+
+        // تحديث الإحصائيات
+        function updateStatistics() {
+            const stats = {
+                total: complaintsData.length,
+                pending: complaintsData.filter(c => c.status === 'معلقة').length,
+                resolved: complaintsData.filter(c => c.status === 'محلولة').length,
+                urgent: complaintsData.filter(c => c.priority === 'عالية').length
+            };
+
+            document.getElementById('totalComplaints').textContent = stats.total;
+            document.getElementById('pendingComplaints').textContent = stats.pending;
+            document.getElementById('resolvedComplaints').textContent = stats.resolved;
+            document.getElementById('urgentComplaints').textContent = stats.urgent;
+        }
+
+        // تحديث الرسم البياني
+        function updateChart() {
+            const ctx = document.getElementById('complaintsChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            const statusData = {
+                'معلقة': complaintsData.filter(c => c.status === 'معلقة').length,
+                'قيد المعالجة': complaintsData.filter(c => c.status === 'قيد المعالجة').length,
+                'محلولة': complaintsData.filter(c => c.status === 'محلولة').length,
+                'مغلقة': complaintsData.filter(c => c.status === 'مغلقة').length
+            };
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(statusData),
+                    datasets: [{
+                        label: 'عدد الشكاوى',
+                        data: Object.values(statusData),
+                        backgroundColor: ['#f39c12', '#3498db', '#27ae60', '#95a5a6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // عرض الشكاوى في الجدول
+        function displayComplaints() {
+            const tbody = document.getElementById('complaintsTableBody');
+            const count = document.getElementById('complaintsCount');
+            
+            count.textContent = `عرض: ${filteredComplaints.length} شكوى`;
+
+            if (filteredComplaints.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            <i class="fas fa-search"></i>
+                            لا توجد شكاوى تطابق معايير البحث
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredComplaints.map(complaint => `
+                <tr>
+                    <td><strong>${complaint.id}</strong></td>
+                    <td>${complaint.name}</td>
+                    <td>${complaint.type}</td>
+                    <td>
+                        <span class="priority-badge priority-${getPriorityClass(complaint.priority)}">
+                            ${complaint.priority}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-${getStatusClass(complaint.status)}">
+                            ${complaint.status}
+                        </span>
+                    </td>
+                    <td>${complaint.createdDate}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-view" onclick="viewComplaint('${complaint.id}')" title="عرض التفاصيل">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editComplaint('${complaint.id}')" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn btn-resolve" onclick="resolveComplaint('${complaint.id}')" title="حل الشكوى">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteComplaint('${complaint.id}')" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // الحصول على فئة CSS للأولوية
+        function getPriorityClass(priority) {
+            switch (priority) {
+                case 'عالية': return 'high';
+                case 'متوسطة': return 'medium';
+                case 'منخفضة': return 'low';
+                default: return 'medium';
+            }
+        }
+
+        // الحصول على فئة CSS للحالة
+        function getStatusClass(status) {
+            switch (status) {
+                case 'معلقة': return 'pending';
+                case 'قيد المعالجة': return 'pending';
+                case 'محلولة': return 'resolved';
+                case 'مغلقة': return 'resolved';
+                default: return 'pending';
+            }
+        }
+
+        // تبديل التبويبات
+        function switchTab(tabName) {
+            // إخفاء جميع التبويبات
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // إزالة الفئة النشطة من جميع الأزرار
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // إظهار التبويب المحدد
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // إضافة الفئة النشطة للزر المحدد
+            event.target.classList.add('active');
+        }
+
+        // تطبيق التصفية
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchComplaint').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const typeFilter = document.getElementById('filterType').value;
+
+            filteredComplaints = complaintsData.filter(complaint => {
+                const matchesSearch = !searchTerm || 
+                    complaint.id.toLowerCase().includes(searchTerm) ||
+                    complaint.name.toLowerCase().includes(searchTerm);
+
+                const matchesStatus = !statusFilter || complaint.status === statusFilter;
+                const matchesType = !typeFilter || complaint.type === typeFilter;
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            displayComplaints();
+        }
+
+        // عرض تفاصيل الشكوى
+        function viewComplaint(id) {
+            const complaint = complaintsData.find(c => c.id === id);
+            if (complaint) {
+                alert(`تفاصيل الشكوى:\n\nرقم الشكوى: ${complaint.id}\nالمشتكي: ${complaint.name}\nالجوال: ${complaint.phone}\nالوحدة: ${complaint.unit}\nالنوع: ${complaint.type}\nالأولوية: ${complaint.priority}\nالحالة: ${complaint.status}\nالوصف: ${complaint.description}\nالمسؤول: ${complaint.assignedTo}\nتاريخ الإنشاء: ${complaint.createdDate}`);
+            }
+        }
+
+        // تعديل الشكوى
+        function editComplaint(id) {
+            alert(`تعديل الشكوى رقم: ${id}\n\nهذه الميزة قيد التطوير...`);
+        }
+
+        // حل الشكوى
+        function resolveComplaint(id) {
+            if (confirm(`هل أنت متأكد من حل الشكوى رقم: ${id}؟`)) {
+                const complaint = complaintsData.find(c => c.id === id);
+                if (complaint) {
+                    complaint.status = 'محلولة';
+                    complaint.updatedDate = new Date().toISOString().split('T')[0];
+                    updateStatistics();
+                    updateChart();
+                    displayComplaints();
+                    alert('تم حل الشكوى بنجاح!');
+                }
+            }
+        }
+
+        // حذف الشكوى
+        function deleteComplaint(id) {
+            if (confirm(`هل أنت متأكد من حذف الشكوى رقم: ${id}؟`)) {
+                const index = complaintsData.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    complaintsData.splice(index, 1);
+                    filteredComplaints = [...complaintsData];
+                    updateStatistics();
+                    updateChart();
+                    displayComplaints();
+                    alert('تم حذف الشكوى بنجاح!');
+                }
+            }
+        }
+
+        // إضافة شكوى جديدة
+        document.getElementById('newComplaintForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newComplaint = {
+                id: 'C' + String(complaintsData.length + 1).padStart(3, '0'),
+                name: document.getElementById('complainerName').value,
+                phone: document.getElementById('complainerPhone').value,
+                unit: document.getElementById('complainerUnit').value,
+                type: document.getElementById('complaintType').value,
+                priority: document.getElementById('priority').value,
+                status: 'معلقة',
+                description: document.getElementById('complaintDescription').value,
+                assignedTo: document.getElementById('assignedTo').value || 'غير محدد',
+                createdDate: new Date().toISOString().split('T')[0],
+                updatedDate: new Date().toISOString().split('T')[0]
+            };
+
+            complaintsData.push(newComplaint);
+            filteredComplaints = [...complaintsData];
+            
+            updateStatistics();
+            updateChart();
+            displayComplaints();
+            
+            this.reset();
+            alert('تم إضافة الشكوى بنجاح!');
+            
+            // التبديل إلى تبويب قائمة الشكاوى
+            switchTab('complaints');
+            document.querySelector('.tab-button').click();
+        });
+
+        // تصدير الشكاوى
+        function exportComplaints() {
+            const data = filteredComplaints.map(complaint => ({
+                'رقم الشكوى': complaint.id,
+                'اسم المشتكي': complaint.name,
+                'رقم الجوال': complaint.phone,
+                'الوحدة السكنية': complaint.unit,
+                'نوع الشكوى': complaint.type,
+                'الأولوية': complaint.priority,
+                'الحالة': complaint.status,
+                'وصف الشكوى': complaint.description,
+                'المسؤول': complaint.assignedTo,
+                'تاريخ الإنشاء': complaint.createdDate,
+                'تاريخ التحديث': complaint.updatedDate
+            }));
+
+            // تحويل البيانات إلى CSV
+            const headers = Object.keys(data[0]);
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => headers.map(header => `"${row[header]}"`).join(','))
+            ].join('\n');
+
+            // تحميل الملف
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `شكاوى_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // تقارير
+        function generateDailyReport() {
+            alert('تقرير يومي للشكاوى\n\nهذه الميزة قيد التطوير...');
+        }
+
+        function generateWeeklyReport() {
+            alert('تقرير أسبوعي للشكاوى\n\nهذه الميزة قيد التطوير...');
+        }
+
+        function generateMonthlyReport() {
+            alert('تقرير شهري للشكاوى\n\nهذه الميزة قيد التطوير...');
+        }
+
+        // إضافة مستمعي الأحداث للبحث والتصفية
+        document.getElementById('searchComplaint').addEventListener('input', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+        document.getElementById('filterType').addEventListener('change', applyFilters);
+
+        // تحميل البيانات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', loadComplaintsData);
+    </script>
+</body>
+</html>
+

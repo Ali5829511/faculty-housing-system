@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة السيارات المكبوحة - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Tajawal:700,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="integration_styles.css">
+  <style>
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: linear-gradient(120deg, #e0e7ef 0%, #f7fcff 100%);
+      margin: 0;
+      padding: 20px 0;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #0f3d68 60%, #2e8bc0 100%);
+      color: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 6px 16px rgba(15, 61, 104, 0.2);
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      margin: 10px 0 0 0;
+      opacity: 0.9;
+    }
+
+    .stats-container {
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 1px solid #e3f2fd;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 1.1em;
+      color: #666;
+    }
+
+    .stat-card.immobilized .stat-number {
+      color: #dc3545;
+    }
+
+    .stat-card.released .stat-number {
+      color: #28a745;
+    }
+
+    .stat-card.total .stat-number {
+      color: #007bff;
+    }
+
+    .stat-card.pending .stat-number {
+      color: #ffc107;
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #0f3d68;
+      border-bottom: 2px solid #e3f2fd;
+      padding-bottom: 10px;
+    }
+
+    .search-filter-container {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table th {
+      background: #0f3d68;
+      color: white;
+      border: none;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .table td {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+
+    .status-immobilized {
+      background: #dc3545;
+      color: white;
+    }
+
+    .status-released {
+      background: #28a745;
+      color: white;
+    }
+
+    .status-pending {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .action-btn {
+      margin: 2px;
+      padding: 5px 10px;
+      font-size: 0.8em;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .chart-container {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .btn-primary {
+      background: #0f3d68;
+      border-color: #0f3d68;
+    }
+
+    .btn-primary:hover {
+      background: #2e8bc0;
+      border-color: #2e8bc0;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.8em;
+      }
+      
+      .stat-number {
+        font-size: 2em;
+      }
+      
+      .content-section {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="back-button">
+    <a href="dashboard.html" class="btn btn-secondary">
+      <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
+    </a>
+  </div>
+
+  <div class="header">
+    <div class="container">
+      <h1><i class="fas fa-car-crash"></i> إدارة السيارات المكبوحة</h1>
+      <p>نظام إدارة إسكان أعضاء هيئة التدريس - جامعة الإمام محمد بن سعود الإسلامية</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- الإحصائيات -->
+    <div class="stats-container">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <div class="stat-card total">
+            <div class="stat-number" id="totalCars">0</div>
+            <div class="stat-label">إجمالي السيارات</div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card immobilized">
+            <div class="stat-number" id="immobilizedCars">0</div>
+            <div class="stat-label">سيارات مكبوحة</div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card released">
+            <div class="stat-number" id="releasedCars">0</div>
+            <div class="stat-label">سيارات محررة</div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card pending">
+            <div class="stat-number" id="pendingCars">0</div>
+            <div class="stat-label">في الانتظار</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الرسم البياني -->
+    <div class="chart-container">
+      <h3 class="section-title"><i class="fas fa-chart-pie"></i> توزيع السيارات المكبوحة</h3>
+      <canvas id="immobilizedChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- البحث والتصفية -->
+    <div class="content-section">
+      <h3 class="section-title"><i class="fas fa-search"></i> البحث والتصفية</h3>
+      <div class="search-filter-container">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="searchInput" class="form-label">البحث</label>
+            <input type="text" class="form-control" id="searchInput" placeholder="ابحث بلوحة السيارة أو اسم المالك أو الوحدة">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="statusFilter" class="form-label">الحالة</label>
+            <select class="form-select" id="statusFilter">
+              <option value="">جميع الحالات</option>
+              <option value="مكبوحة">مكبوحة</option>
+              <option value="محررة">محررة</option>
+              <option value="في الانتظار">في الانتظار</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="reasonFilter" class="form-label">سبب الكبح</label>
+            <select class="form-select" id="reasonFilter">
+              <option value="">جميع الأسباب</option>
+              <option value="وقوف في مكان محظور">وقوف في مكان محظور</option>
+              <option value="عدم وجود ملصق صالح">عدم وجود ملصق صالح</option>
+              <option value="مخالفة مرورية متكررة">مخالفة مرورية متكررة</option>
+              <option value="عدم دفع الغرامات">عدم دفع الغرامات</option>
+            </select>
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary w-100" onclick="applyFilters()">
+              <i class="fas fa-filter"></i> تطبيق
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- جدول السيارات المكبوحة -->
+    <div class="content-section">
+      <h3 class="section-title"><i class="fas fa-list"></i> قائمة السيارات المكبوحة</h3>
+      <div class="table-container">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>رقم اللوحة</th>
+              <th>اسم المالك</th>
+              <th>الوحدة السكنية</th>
+              <th>تاريخ الكبح</th>
+              <th>سبب الكبح</th>
+              <th>الموقع</th>
+              <th>الحالة</th>
+              <th>المسؤول</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="carsTableBody">
+            <!-- سيتم ملء البيانات هنا -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- ترقيم الصفحات -->
+      <div class="pagination-container">
+        <nav>
+          <ul class="pagination" id="pagination">
+            <!-- سيتم إنشاء ترقيم الصفحات هنا -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ودجت المراجع المتقاطعة -->
+    <div id="crossReferenceWidget"></div>
+  </div>
+
+  <!-- نظام الربط الشامل -->
+  <script src="system_integration.js"></script>
+  <!-- ودجت المراجع المتقاطعة -->
+  <script src="cross_reference_widget.js"></script>
+  <!-- Chart.js للرسوم البيانية -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // متغيرات عامة
+    let immobilizedCarsData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let chart = null;
+
+    // تحميل البيانات عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+      loadImmobilizedCarsData();
+      setupEventListeners();
+    });
+
+    // تحميل بيانات السيارات المكبوحة
+    async function loadImmobilizedCarsData() {
+      try {
+        const response = await fetch('immobilized_cars_data.json');
+        if (response.ok) {
+          immobilizedCarsData = await response.json();
+          filteredData = [...immobilizedCarsData];
+          updateStatistics();
+          displayCarsTable();
+          createChart();
+        } else {
+          console.error('فشل في تحميل بيانات السيارات المكبوحة');
+        }
+      } catch (error) {
+        console.error('خطأ في تحميل البيانات:', error);
+      }
+    }
+
+    // تحديث الإحصائيات
+    function updateStatistics() {
+      const total = immobilizedCarsData.length;
+      const immobilized = immobilizedCarsData.filter(car => car.status === 'مكبوحة').length;
+      const released = immobilizedCarsData.filter(car => car.status === 'محررة').length;
+      const pending = immobilizedCarsData.filter(car => car.status === 'في الانتظار').length;
+
+      document.getElementById('totalCars').textContent = total;
+      document.getElementById('immobilizedCars').textContent = immobilized;
+      document.getElementById('releasedCars').textContent = released;
+      document.getElementById('pendingCars').textContent = pending;
+    }
+
+    // إنشاء الرسم البياني
+    function createChart() {
+      const ctx = document.getElementById('immobilizedChart').getContext('2d');
+      
+      if (chart) {
+        chart.destroy();
+      }
+
+      const immobilized = immobilizedCarsData.filter(car => car.status === 'مكبوحة').length;
+      const released = immobilizedCarsData.filter(car => car.status === 'محررة').length;
+      const pending = immobilizedCarsData.filter(car => car.status === 'في الانتظار').length;
+
+      chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['مكبوحة', 'محررة', 'في الانتظار'],
+          datasets: [{
+            data: [immobilized, released, pending],
+            backgroundColor: ['#dc3545', '#28a745', '#ffc107'],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: {
+                  family: 'Tajawal'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // عرض جدول السيارات
+    function displayCarsTable() {
+      const tbody = document.getElementById('carsTableBody');
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = filteredData.slice(startIndex, endIndex);
+
+      tbody.innerHTML = pageData.map(car => `
+        <tr>
+          <td><strong>${car.car_plate}</strong></td>
+          <td>${car.owner_name}</td>
+          <td>${car.unit}</td>
+          <td>${car.immobilization_date}</td>
+          <td>${car.reason}</td>
+          <td>${car.location}</td>
+          <td>
+            <span class="status-badge status-${car.status === 'مكبوحة' ? 'immobilized' : car.status === 'محررة' ? 'released' : 'pending'}">
+              ${car.status}
+            </span>
+          </td>
+          <td>${car.officer_name}</td>
+          <td>
+            <button class="btn btn-sm btn-primary action-btn" onclick="showCarDetails(${car.id})">
+              <i class="fas fa-eye"></i> عرض
+            </button>
+            <button class="btn btn-sm btn-warning action-btn" onclick="editCar(${car.id})">
+              <i class="fas fa-edit"></i> تعديل
+            </button>
+            ${car.status === 'مكبوحة' ? 
+              `<button class="btn btn-sm btn-success action-btn" onclick="releaseCar(${car.id})">
+                <i class="fas fa-unlock"></i> تحرير
+              </button>` : ''
+            }
+          </td>
+        </tr>
+      `).join('');
+
+      updatePagination();
+    }
+
+    // تحديث ترقيم الصفحات
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      const pagination = document.getElementById('pagination');
+      
+      let paginationHTML = '';
+      
+      // زر السابق
+      if (currentPage > 1) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1})">السابق</a></li>`;
+      }
+      
+      // أرقام الصفحات
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+          paginationHTML += `<li class="page-item active"><a class="page-link" href="#">${i}</a></li>`;
+        } else {
+          paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+      }
+      
+      // زر التالي
+      if (currentPage < totalPages) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage + 1})">التالي</a></li>`;
+      }
+      
+      pagination.innerHTML = paginationHTML;
+    }
+
+    // تغيير الصفحة
+    function changePage(page) {
+      currentPage = page;
+      displayCarsTable();
+    }
+
+    // تطبيق المرشحات
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const reasonFilter = document.getElementById('reasonFilter').value;
+
+      filteredData = immobilizedCarsData.filter(car => {
+        const matchesSearch = !searchTerm || 
+          car.car_plate.toLowerCase().includes(searchTerm) ||
+          car.owner_name.toLowerCase().includes(searchTerm) ||
+          car.unit.toLowerCase().includes(searchTerm);
+        
+        const matchesStatus = !statusFilter || car.status === statusFilter;
+        const matchesReason = !reasonFilter || car.reason === reasonFilter;
+
+        return matchesSearch && matchesStatus && matchesReason;
+      });
+
+      currentPage = 1;
+      displayCarsTable();
+    }
+
+    // إعداد مستمعي الأحداث
+    function setupEventListeners() {
+      // البحث الفوري
+      document.getElementById('searchInput').addEventListener('input', applyFilters);
+      document.getElementById('statusFilter').addEventListener('change', applyFilters);
+      document.getElementById('reasonFilter').addEventListener('change', applyFilters);
+    }
+
+    // عرض تفاصيل السيارة
+    function showCarDetails(carId) {
+      const car = immobilizedCarsData.find(c => c.id === carId);
+      if (car && window.crossRefWidget) {
+        window.crossRefWidget.showRelatedData('immobilized_car', carId, car);
+      }
+    }
+
+    // تعديل بيانات السيارة
+    function editCar(carId) {
+      const car = immobilizedCarsData.find(c => c.id === carId);
+      if (car) {
+        alert(`تعديل بيانات السيارة: ${car.car_plate}\nهذه الميزة قيد التطوير.`);
+      }
+    }
+
+    // تحرير السيارة
+    function releaseCar(carId) {
+      const car = immobilizedCarsData.find(c => c.id === carId);
+      if (car && confirm(`هل أنت متأكد من تحرير السيارة ${car.car_plate}؟`)) {
+        car.status = 'محررة';
+        updateStatistics();
+        displayCarsTable();
+        createChart();
+        alert('تم تحرير السيارة بنجاح!');
+      }
+    }
+
+    // تصدير البيانات
+    function exportData() {
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "رقم اللوحة,اسم المالك,الوحدة السكنية,تاريخ الكبح,سبب الكبح,الموقع,الحالة,المسؤول,الملاحظات\n" +
+        filteredData.map(car => 
+          `${car.car_plate},${car.owner_name},${car.unit},${car.immobilization_date},${car.reason},${car.location},${car.status},${car.officer_name},${car.notes}`
+        ).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "السيارات_المكبوحة.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
+
