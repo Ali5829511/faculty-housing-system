@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-logo">
+            <img src="images/logo.png" alt="شعار الجامعة">
+        </div>
+        <div class="header-title">نظام إدارة إسكان أعضاء هيئة التدريس</div>
+        <div class="user-info">
+            <span id="user-name"></span>
+            <i class="fas fa-user-circle"></i>
+            <button onclick="logout()" class="btn-primary" style="margin-right: 15px; padding: 5px 10px;">خروج</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <h1>لوحة التحكم الرئيسية</h1>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be loaded here by JavaScript -->
+        </div>
+
+        <!-- Charts Section -->
+        <div class="card" style="margin-top: 30px;">
+            <h2>إحصائيات الشكاوى والمخالفات</h2>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                <div style="width: 45%; min-width: 300px; margin-bottom: 20px;">
+                    <h3>حالة الشكاوى</h3>
+                    <canvas id="complaintsChart"></canvas>
+                </div>
+                <div style="width: 45%; min-width: 300px; margin-bottom: 20px;">
+                    <h3>أنواع المخالفات</h3>
+                    <canvas id="violationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Traffic Accidents Section (Reformatted) -->
+        <div class="card" style="margin-top: 30px;">
+            <h2><i class="fas fa-car-crash"></i> سجل حوادث المرور الأخيرة</h2>
+            <div class="user-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الموقع</th>
+                            <th>المبلغ عن الحادث</th>
+                            <th>الخطورة</th>
+                            <th>الحالة</th>
+                            <th>الوصف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accidents-table-body">
+                        <!-- Accidents data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="traffic_accidents.html" class="btn-primary" style="background-color: #dc3545;">
+                    <i class="fas fa-eye"></i> عرض سجل الحوادث بالكامل
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation Links (Temporary for now) -->
+        <div class="card" style="margin-top: 30px;">
+            <h2>إدارة النظام</h2>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <a href="advanced_users_management.html" class="btn-primary">إدارة المستخدمين</a>
+                <a href="buildings_management.html" class="btn-primary">إدارة المباني</a>
+                <a href="residents_management.html" class="btn-primary">إدارة السكان</a>
+                <a href="parking_management.html" class="btn-primary">إدارة المواقف</a>
+                <a href="traffic_violations.html" class="btn-primary">تسجيل المخالفات</a>
+                <a href="complaints_management.html" class="btn-primary">إدارة الشكاوى</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Check for user login status
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('user-name').textContent = user.name + ' (' + user.role + ')';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Fetch Stats
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                const statsGrid = document.getElementById('stats-grid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-building"></i></div>
+                        <div class="value">${stats.buildings_count}</div>
+                        <div class="label">إجمالي المباني والفلل</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                        <div class="value">${stats.residents_count}</div>
+                        <div class="label">إجمالي السكان</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-parking"></i></div>
+                        <div class="value">${stats.parking_count}</div>
+                        <div class="label">إجمالي المواقف</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="value">${stats.violations_count}</div>
+                        <div class="label">مخالفات مرورية مفتوحة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-headset"></i></div>
+                        <div class="value">${stats.complaints_count}</div>
+                        <div class="label">شكاوى قيد المراجعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-car-crash"></i></div>
+                        <div class="value">${stats.accidents_count}</div>
+                        <div class="label">حوادث مرورية مسجلة</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Fetch Accidents (Will be updated in Phase 4)
+        async function fetchAccidents() {
+            try {
+                const response = await fetch('/api/accidents');
+                const accidents = await response.json();
+                const tableBody = document.getElementById('accidents-table-body');
+                tableBody.innerHTML = '';
+                accidents.slice(0, 5).forEach(accident => { // عرض آخر 5 حوادث
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${new Date(accident.date).toLocaleDateString('ar-SA')}</td>
+                        <td>${accident.location}</td>
+                        <td>${accident.reporter_name}</td>
+                        <td>${accident.severity}</td>
+                        <td>${accident.status}</td>
+                        <td>${accident.description.substring(0, 50)}...</td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching accidents:', error);
+            }
+        }
+
+        // Dummy Chart Data (Needs real data API in later phases)
+        function renderCharts() {
+            // Complaints Chart
+            new Chart(document.getElementById('complaintsChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['قيد المراجعة', 'تم الحل', 'مغلقة'],
+                    datasets: [{
+                        data: [5, 15, 2],
+                        backgroundColor: ['#ffc107', '#28a745', '#6c757d'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    family: 'Arial',
+                                }
+                            }
+                        },
+                        title: {
+                            display: false,
+                        }
+                    }
+                }
+            });
+
+            // Violations Chart
+            new Chart(document.getElementById('violationsChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['وقوف خاطئ', 'تجاوز السرعة', 'إعاقة حركة'],
+                    datasets: [{
+                        label: 'عدد المخالفات',
+                        data: [10, 5, 3],
+                        backgroundColor: ['#dc3545', '#ffc107', '#007bff'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStats();
+            fetchAccidents();
+            renderCharts();
+        });
+    </script>
+</body>
+</html>

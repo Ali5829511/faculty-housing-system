@@ -1,0 +1,158 @@
+/* ملف style.css الأساسي */
+
+:root {
+    --primary-color: #004d99; /* أزرق داكن احترافي */
+    --secondary-color: #007bff; /* أزرق فاتح */
+    --background-color: #f4f7f9;
+    --card-background: #ffffff;
+    --text-color: #333;
+    --header-height: 60px;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    direction: rtl;
+    text-align: right;
+    margin: 0;
+    padding-top: var(--header-height); /* ترك مساحة للهيدر الثابت */
+}
+
+/* تنسيق الهيدر (Header) */
+.main-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: var(--header-height);
+    background-color: var(--card-background);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+}
+
+.header-logo img {
+    height: 40px; /* حجم الشعار */
+    width: auto;
+}
+
+.header-title {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: var(--primary-color);
+}
+
+.user-info i {
+    margin-left: 10px;
+}
+
+/* تنسيق لوحة التحكم (Dashboard) */
+.dashboard-container {
+    padding: 20px;
+}
+
+/* تنسيق الأزرار */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #003366;
+}
+
+/* تنسيق البطاقات (Cards) */
+.card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* تنسيق الجداول */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: right;
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* تنسيق الإحصائيات */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: var(--card-background);
+}
+
+.stat-card .icon {
+    font-size: 2em;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+}
+
+.stat-card .value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.stat-card .label {
+    font-size: 1em;
+    color: #666;
+}
+
+/* إخفاء القائمة الجانبية (Sidebar) مؤقتاً والتركيز على المحتوى الرئيسي */
+.sidebar {
+    display: none;
+}
+
+/* تنسيق خاص بالجوال */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 10px;
+    }
+    .main-header {
+        padding: 0 10px;
+    }
+    .header-title {
+        font-size: 1.2em;
+    }
+    .header-logo img {
+        height: 30px;
+    }
+}
