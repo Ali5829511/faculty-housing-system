@@ -27,6 +27,3 @@ nohup.out
 # OS
 .DS_Store
 Thumbs.db
-
-# Application specific
-app.log
