@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المباني - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-logo">
+            <img src="images/logo.png" alt="شعار الجامعة">
+        </div>
+        <div class="header-title">نظام إدارة إسكان أعضاء هيئة التدريس</div>
+        <div class="user-info">
+            <span id="user-name"></span>
+            <i class="fas fa-user-circle"></i>
+            <button onclick="logout()" class="btn-primary" style="margin-right: 15px; padding: 5px 10px;">خروج</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="card">
+            <h1><i class="fas fa-building"></i> إدارة المباني والفلل</h1>
+            <div class="controls-bar">
+                <button class="btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> إضافة مبنى/فلة جديد</button>
+                <button class="btn-primary" onclick="exportData('pdf')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                <button class="btn-primary" onclick="exportData('excel')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                <a href="dashboard.html" class="btn-primary" style="background-color: #6c757d;"><i class="fas fa-arrow-right"></i> العودة للوحة التحكم</a>
+            </div>
+
+            <div class="user-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>رقم المبنى/الفلة</th>
+                            <th>النوع</th>
+                            <th>عدد الشقق/الغرف</th>
+                            <th>الحالة</th>
+                            <th>المواقف المخصصة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="buildings-table-body">
+                        <!-- Data will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal (Placeholder) -->
+    <div id="addEditModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>إضافة/تعديل مبنى</h2>
+            <form id="buildingForm">
+                <!-- Form fields here -->
+                <button type="submit" class="btn-primary">حفظ</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Basic Authentication Check
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('user-name').textContent = user.name + ' (' + user.role + ')';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // CRUD and Export Functions (Placeholders)
+        async function fetchBuildings() {
+            // Placeholder for fetching data from /api/buildings
+            const dummyData = [
+                { id: 1, number: 'مبنى 1', type: 'قديم', units: 12, status: 'ممتلئ', parking: 12 },
+                { id: 2, number: 'فلة 10', type: 'فلة', units: 5, status: 'شاغر', parking: 2 },
+                { id: 3, number: 'مبنى ج', type: 'جديد', units: 16, status: 'ممتلئ', parking: 16 },
+            ];
+            const tableBody = document.getElementById('buildings-table-body');
+            tableBody.innerHTML = '';
+            dummyData.forEach(building => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${building.number}</td>
+                    <td>${building.type}</td>
+                    <td>${building.units}</td>
+                    <td>${building.status}</td>
+                    <td>${building.parking}</td>
+                    <td>
+                        <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${building.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteBuilding(${building.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function exportData(format) {
+            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
+            // Actual implementation will call /api/export/buildings?format=pdf or excel
+        }
+
+        function openAddModal() { /* ... */ }
+        function openEditModal(id) { /* ... */ }
+        function deleteBuilding(id) { /* ... */ }
+        function closeModal() { /* ... */ }
+
+        document.addEventListener('DOMContentLoaded', fetchBuildings);
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المواقف - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-logo">
+            <img src="images/logo.png" alt="شعار الجامعة">
+        </div>
+        <div class="header-title">نظام إدارة إسكان أعضاء هيئة التدريس</div>
+        <div class="user-info">
+            <span id="user-name"></span>
+            <i class="fas fa-user-circle"></i>
+            <button onclick="logout()" class="btn-primary" style="margin-right: 15px; padding: 5px 10px;">خروج</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="card">
+            <h1><i class="fas fa-parking"></i> إدارة المواقف والملصقات</h1>
+            <div class="controls-bar">
+                <button class="btn-primary" onclick="exportData('pdf')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                <button class="btn-primary" onclick="exportData('excel')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                <a href="dashboard.html" class="btn-primary" style="background-color: #6c757d;"><i class="fas fa-arrow-right"></i> العودة للوحة التحكم</a>
+            </div>
+
+            <div class="user-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>رقم الموقف</th>
+                            <th>المبنى/الفلة</th>
+                            <th>حالة الموقف</th>
+                            <th>رقم الملصق</th>
+                            <th>المركبة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parking-table-body">
+                        <!-- Data will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic Authentication Check
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('user-name').textContent = user.name + ' (' + user.role + ')';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // CRUD and Export Functions (Placeholders)
+        async function fetchParking() {
+            // Placeholder for fetching data from /api/parking
+            const dummyData = [
+                { id: 1, number: 'P-101', building: 'مبنى 1', status: 'مشغول', sticker: 'A001', vehicle: 'تويوتا كامري' },
+                { id: 2, number: 'P-F10', building: 'فلة 10', status: 'شاغر', sticker: 'N/A', vehicle: 'N/A' },
+                { id: 3, number: 'P-205', building: 'مبنى ج', status: 'مشغول', sticker: 'B055', vehicle: 'هوندا أكورد' },
+            ];
+            const tableBody = document.getElementById('parking-table-body');
+            tableBody.innerHTML = '';
+            dummyData.forEach(parking => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${parking.number}</td>
+                    <td>${parking.building}</td>
+                    <td>${parking.status}</td>
+                    <td>${parking.sticker}</td>
+                    <td>${parking.vehicle}</td>
+                    <td>
+                        <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${parking.id})"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function exportData(format) {
+            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
+            // Actual implementation will call /api/export/parking?format=pdf or excel
+        }
+
+        function openEditModal(id) { /* ... */ }
+
+        document.addEventListener('DOMContentLoaded', fetchParking);
+    </script>
+</body>
+</html>

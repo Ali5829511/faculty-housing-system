@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل المخالفات - نظام إدارة إسكان أعضاء هيئة التدريس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-logo">
+            <img src="images/logo.png" alt="شعار الجامعة">
+        </div>
+        <div class="header-title">نظام إدارة إسكان أعضاء هيئة التدريس</div>
+        <div class="user-info">
+            <span id="user-name"></span>
+            <i class="fas fa-user-circle"></i>
+            <button onclick="logout()" class="btn-primary" style="margin-right: 15px; padding: 5px 10px;">خروج</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="card">
+            <h1><i class="fas fa-ban"></i> تسجيل وإدارة المخالفات المرورية</h1>
+            <div class="controls-bar">
+                <button class="btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> تسجيل مخالفة جديدة</button>
+                <button class="btn-primary" onclick="exportData('pdf')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                <button class="btn-primary" onclick="exportData('excel')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                <a href="dashboard.html" class="btn-primary" style="background-color: #6c757d;"><i class="fas fa-arrow-right"></i> العودة للوحة التحكم</a>
+            </div>
+
+            <div class="user-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>رقم المخالفة</th>
+                            <th>نوع المخالفة</th>
+                            <th>رقم اللوحة</th>
+                            <th>الموقع</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="violations-table-body">
+                        <!-- Data will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal (Placeholder) -->
+    <div id="addEditModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>تسجيل/تعديل مخالفة</h2>
+            <form id="violationForm">
+                <!-- Form fields here -->
+                <button type="submit" class="btn-primary">حفظ</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Basic Authentication Check
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('user-name').textContent = user.name + ' (' + user.role + ')';
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // CRUD and Export Functions (Placeholders)
+        async function fetchViolations() {
+            // Placeholder for fetching data from /api/violations
+            const dummyData = [
+                { id: 1, type: 'وقوف خاطئ', plate: 'أ ب ج 123', location: 'مبنى 1', date: '2025-12-15', status: 'مفتوحة' },
+                { id: 2, type: 'تجاوز السرعة', plate: 'د ه و 456', location: 'الشارع الرئيسي', date: '2025-12-14', status: 'مغلقة' },
+                { id: 3, type: 'إعاقة حركة', plate: 'ز ح ط 789', location: 'موقف فلة 5', date: '2025-12-13', status: 'مفتوحة' },
+            ];
+            const tableBody = document.getElementById('violations-table-body');
+            tableBody.innerHTML = '';
+            dummyData.forEach(violation => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${violation.id}</td>
+                    <td>${violation.type}</td>
+                    <td>${violation.plate}</td>
+                    <td>${violation.location}</td>
+                    <td>${violation.date}</td>
+                    <td>${violation.status}</td>
+                    <td>
+                        <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${violation.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteViolation(${violation.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function exportData(format) {
+            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
+            // Actual implementation will call /api/export/violations?format=pdf or excel
+        }
+
+        function openAddModal() { /* ... */ }
+        function openEditModal(id) { /* ... */ }
+        function deleteViolation(id) { /* ... */ }
+        function closeModal() { /* ... */ }
+
+        document.addEventListener('DOMContentLoaded', fetchViolations);
+    </script>
+</body>
+</html>
