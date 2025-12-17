@@ -1,0 +1,500 @@
+openapi: 3.0.3
+info:
+  title: ParkPow API
+  version: 1.0.0
+  description: "[ParkPow](https://parkpow.com/) is a software to manage and enforce\
+    \ parking lots. It lets you track vehicles, get custom alerts, enforce your parking\
+    \ rules.    <br><br><br>\n    ParkPow.com API is only available to registered\
+    \ users.\n    You first have to register and <a href=\"https://app.parkpow.com/accounts/token/\"\
+    >get an API key</a>.\n    It has to be included in all API calls. The HTTP <b>headers</b>\
+    \ must contain:\n    <br><br>\n    <code>Authorization: Token API_TOKEN</code>\n\
+    \    <br><br>\n    <aside>You must replace <code>API_TOKEN</code> with your personal\
+    \ API key.</aside>\n    "
+  x-logo:
+    url: /static/images/docs-logo.png
+    backgroundColor: rgb(38, 50, 56)
+    href: /
+    altText: Logo
+paths:
+  /api/v1/create-camera/:
+    post:
+      operationId: Create or Update Camera Details
+      description: |-
+        This API endpoint is used to create or update a camera object used
+        while integrating your data into ParkPow. Your are adviced to create
+        a few cameras (Entrance or Exit) before using the integration
+        api.
+      tags:
+      - Cameras
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Camera'
+            examples:
+              Example1:
+                value:
+                  code: Entrance1
+                  name: Entrance 1
+                  type: Entrance
+                  latitude: 0.33
+                  longitude: 0.333
+                  notes: Front gate
+                summary: Example 1
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Camera'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Camera'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Camera'
+              examples:
+                Example1:
+                  value:
+                    code: Entrance1
+                    name: Entrance 1
+                    type: Entrance
+                    latitude: 0.33
+                    longitude: 0.333
+                    notes: Front gate
+                  summary: Example 1
+          description: The result includes an extra type field.
+        '400':
+          description: Bad request
+  /api/v1/create-vehicle/:
+    post:
+      operationId: Create or Update Vehicle
+      description: |-
+        Purpose is: Incorporate 3rd party data (e.g. tenant database,
+        HR database, payment database) into ParkPow so that you can more
+        fully understand the vehicles captured in the dashboard.
+      tags:
+      - Vehicles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+            examples:
+              ExampleRequest:
+                value:
+                  license_plate: ABC1234
+                  region: us-ny
+                  payment_status: 0
+                  make: Nissan
+                  model: X3
+                  color: yellow
+                  type: pickup_truck
+                  field1: First Name
+                  field2: Last Name
+                  field3: Department
+                  field4: Company
+                  field5: 'Floor #'
+                  field6: Notes
+                summary: Example Request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+              examples:
+                ExampleResponse:
+                  value:
+                    license_plate: ABC1234
+                    region: us-ny
+                    payment_status: 0
+                    make: Nissan
+                    model: X3
+                    color: yellow
+                    type: pickup_truck
+                    field1: First Name
+                    field2: Last Name
+                    field3: Department
+                    field4: Company
+                    field5: 'Floor #'
+                    field6: Notes
+                    id: 100
+                    vehicle_tags:
+                    - Authorized
+                  summary: Example Response
+          description: ''
+  /api/v1/delete-vehicle/:
+    post:
+      operationId: Delete Vehicle
+      description: Used by GenericAPIView subclasses.
+      tags:
+      - Vehicles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleDelete'
+            examples:
+              Example1:
+                value:
+                  id: 654
+                summary: Example 1
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VehicleDelete'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VehicleDelete'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDelete'
+              examples:
+                Example1:
+                  value:
+                    id: 654
+                  summary: Example 1
+          description: ''
+  /api/v1/delete-visit/:
+    post:
+      operationId: Delete Visit
+      description: Used by GenericAPIView subclasses.
+      tags:
+      - Visits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitId'
+            examples:
+              Example1:
+                value:
+                  id: 9637
+                summary: Example 1
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitId'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitId'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitId'
+              examples:
+                Example1:
+                  value:
+                    id: 9637
+                  summary: Example 1
+          description: ''
+  /api/v1/edit-tags/:
+    post:
+      operationId: Update Vehicle's Tags
+      description: Update Vehicle's Tags
+      tags:
+      - Vehicles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditTagParams'
+            examples:
+              Example1:
+                value:
+                  vehicle_id: 654
+                  tag_id: 44
+                  checked: 'false'
+                summary: Example 1
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EditTagParams'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EditTagParams'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditTagParams'
+              examples:
+                Example1:
+                  value:
+                    vehicle_id: 654
+                    tag_id: 44
+                    checked: 'false'
+                  summary: Example 1
+          description: ''
+  /api/v1/import-vehicles/:
+    post:
+      operationId: Import Vehicles
+      description: This API endpoint lets you add, overwrite or remove vehicles in
+        your ParkPow account.
+      tags:
+      - Vehicles
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportVehicles'
+            examples:
+              RequestExample:
+                value:
+                  import_file: vehicle_file_examples.csv
+                  remove: false
+                summary: Request Example
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportVehiclesResponse'
+              examples:
+                ResponseExample:
+                  value:
+                    task_id: '1234567890'
+                  summary: Response Example
+          description: ''
+  /api/v1/log-vehicle/:
+    post:
+      operationId: Create Visit (Send Camera Images and License Plate Data)
+      description: |-
+        Allows to integrate your cameras and ALPR software with ParkPow.
+        This endpoint is used to create visits which are listed on Dashboard.
+        Also if it is the first vehicle's visit, the new vehicle will be added
+        to database. If 'pm' option is True, the entrance and exit will be
+        combined to one visit (one record). If 'pm' option is False,
+        new visit will be created for each entrance and exit.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Visits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LPR'
+            examples:
+              Example:
+                value:
+                  camera: entrance_1
+                  image: iVBORw0KGgoAAAANSUhEUgAAAEQAAAAYCAIAAADMPcxpAAAPyElEQ...
+                  results:
+                  - plate:
+                      box:
+                        xmin: 231
+                        ymin: 238
+                        ymax: 266
+                        xmax: 305
+                      score: 0.592
+                      type: Plate
+                      props:
+                        plate:
+                        - value: smm1439
+                          score: 0.905
+                        - value: smh1439
+                          score: 0.743
+                        region:
+                        - value: bg
+                          score: 0.795
+                    direction: 180
+                    position_sec: 34.94
+                    vehicle:
+                      box:
+                        xmin: 231
+                        ymin: 131
+                        ymax: 523
+                        xmax: 1070
+                      score: 0.834
+                      type: Sedan
+                      props:
+                        color:
+                        - score: 0.877
+                          value: silver
+                        - score: 0.019
+                          value: black
+                        - score: 0.016
+                          value: green
+                        orientation:
+                        - score: 0.937
+                          value: Front
+                        - score: 0.032
+                          value: Rear
+                        - score: 0.031
+                          value: Unknown
+                        make_model:
+                        - make: BMW
+                          score: 0.55
+                          model: 5 Series
+                        - make: BMW
+                          score: 0.153
+                          model: E83
+                        - make: BMW
+                          score: 0.029
+                          model: X5
+                  time: 2020-08-21T17:32
+              ExampleLegacyFormatStillSupported:
+                value:
+                  camera: entrance_1
+                  image: iVBORw0KGgoAAAANSUhEUgAAAEQAAAAYCAIAAADMPcxpAAAPyElEQ...
+                  results:
+                  - box:
+                      xmin: 374
+                      ymin: 468
+                      ymax: 548
+                      xmax: 710
+                    plate: smm1439
+                    direction: 180
+                    dscore: 0.592
+                    orientation:
+                    - score: 0.921
+                      orientation: Front
+                    - score: 0.041
+                      orientation: Unknown
+                    - score: 0.038
+                      orientation: Rear
+                    color:
+                    - color: silver
+                      score: 0.864
+                    - color: black
+                      score: 0.03
+                    - color: yellow
+                      score: 0.017
+                    region:
+                      code: bg
+                      score: 0.795
+                    model_make:
+                    - make: BMW
+                      score: 0.254
+                      model: 5 Series
+                    - make: BMW
+                      score: 0.131
+                      model: 5 Series (E60)
+                    - make: BMW
+                      score: 0.073
+                      model: '525'
+                    source_url: rtsp://192.168.1.9:8554/mystream
+                    score: 0.905
+                    candidates:
+                    - plate: b2228hm
+                    vehicle:
+                      box:
+                        xmin: 284
+                        ymin: 243
+                        ymax: 970
+                        xmax: 1344
+                      score: 0.834
+                      type: Sedan
+                    position_sec: 7.76
+                  time: 2020-08-21T17:32
+                summary: Example Legacy format still supported
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LPR'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LPR'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNewVisitList'
+          description: ''
+  /api/v1/parking-list/:
+    get:
+      operationId: Export All Site Data
+      description: |-
+        Retrieve all site data including the cameras associated
+        with each site.
+
+        Examples:
+        --------
+            curl --location --request GET '/api/v1/parking-list/' --header 'Authorization: Token <api_token>'
+      parameters:
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Sites
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:

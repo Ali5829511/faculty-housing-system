@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1764283374097,
+      "tag": "0000_breezy_rumiko_fujikawa",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1764283448751,
+      "tag": "0001_abnormal_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1764288708022,
+      "tag": "0002_tiresome_domino",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1764320626293,
+      "tag": "0003_mighty_psynapse",
+      "breakpoints": true
+    }
+  ]
+}
