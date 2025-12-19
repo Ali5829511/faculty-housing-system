@@ -6,6 +6,57 @@
     <title>تسجيل المخالفات - نظام إدارة إسكان أعضاء هيئة التدريس</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* إضافة تنسيق بسيط للمودال */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -36,12 +87,13 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>رقم المخالفة</th>
+                            <th>الرقم</th>
                             <th>نوع المخالفة</th>
-                            <th>رقم اللوحة</th>
-                            <th>الموقع</th>
+                            <th>رقم الساكن</th>
+                            <th>الوصف</th>
                             <th>التاريخ</th>
                             <th>الحالة</th>
+                            <th>المبلغ</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -53,19 +105,48 @@
         </div>
     </div>
 
-    <!-- Add/Edit Modal (Placeholder) -->
+    <!-- Add/Edit Modal -->
     <div id="addEditModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal()">&times;</span>
-            <h2>تسجيل/تعديل مخالفة</h2>
+            <h2 id="modal-title">تسجيل مخالفة جديدة</h2>
             <form id="violationForm">
-                <!-- Form fields here -->
+                <input type="hidden" id="violation-id" name="id">
+                <div class="form-group">
+                    <label for="violation-type">نوع المخالفة</label>
+                    <input type="text" id="violation-type" name="violation_type" required>
+                </div>
+                <div class="form-group">
+                    <label for="resident-id">رقم الساكن (اختياري)</label>
+                    <input type="number" id="resident-id" name="resident_id" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="violation-description">الوصف</label>
+                    <textarea id="violation-description" name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="violation-amount">المبلغ (ريال)</label>
+                    <input type="number" id="violation-amount" name="amount" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="violation-status">الحالة</label>
+                    <select id="violation-status" name="status" required>
+                        <option value="open">مفتوحة</option>
+                        <option value="closed">مغلقة</option>
+                    </select>
+                </div>
                 <button type="submit" class="btn-primary">حفظ</button>
             </form>
         </div>
     </div>
 
     <script>
+        const API_URL = '/api/violations';
+        const modal = document.getElementById('addEditModal');
+        const form = document.getElementById('violationForm');
+        const modalTitle = document.getElementById('modal-title');
+        let isEditMode = false;
+
         // Basic Authentication Check
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
@@ -79,42 +160,132 @@
             window.location.href = 'login.html';
         }
 
-        // CRUD and Export Functions (Placeholders)
+        // CRUD Functions
         async function fetchViolations() {
-            // Placeholder for fetching data from /api/violations
-            const dummyData = [
-                { id: 1, type: 'وقوف خاطئ', plate: 'أ ب ج 123', location: 'مبنى 1', date: '2025-12-15', status: 'مفتوحة' },
-                { id: 2, type: 'تجاوز السرعة', plate: 'د ه و 456', location: 'الشارع الرئيسي', date: '2025-12-14', status: 'مغلقة' },
-                { id: 3, type: 'إعاقة حركة', plate: 'ز ح ط 789', location: 'موقف فلة 5', date: '2025-12-13', status: 'مفتوحة' },
-            ];
-            const tableBody = document.getElementById('violations-table-body');
-            tableBody.innerHTML = '';
-            dummyData.forEach(violation => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${violation.id}</td>
-                    <td>${violation.type}</td>
-                    <td>${violation.plate}</td>
-                    <td>${violation.location}</td>
-                    <td>${violation.date}</td>
-                    <td>${violation.status}</td>
-                    <td>
-                        <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${violation.id})"><i class="fas fa-edit"></i></button>
-                        <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteViolation(${violation.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-            });
+            try {
+                const response = await fetch(API_URL);
+                const violations = await response.json();
+                const tableBody = document.getElementById('violations-table-body');
+                tableBody.innerHTML = '';
+                violations.forEach(violation => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${violation.id}</td>
+                        <td>${violation.violation_type}</td>
+                        <td>${violation.resident_id || '-'}</td>
+                        <td>${violation.description || '-'}</td>
+                        <td>${violation.date.split('T')[0]}</td>
+                        <td>${violation.status === 'open' ? 'مفتوحة' : 'مغلقة'}</td>
+                        <td>${violation.amount}</td>
+                        <td>
+                            <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${violation.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteViolation(${violation.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching violations:', error);
+                alert('حدث خطأ أثناء جلب بيانات المخالفات.');
+            }
         }
 
+        function openAddModal() {
+            isEditMode = false;
+            modalTitle.textContent = 'تسجيل مخالفة جديدة';
+            form.reset();
+            document.getElementById('violation-id').value = '';
+            modal.style.display = 'block';
+        }
+
+        async function openEditModal(id) {
+            try {
+                const response = await fetch(API_URL);
+                const violations = await response.json();
+                const violation = violations.find(v => v.id === id);
+
+                if (violation) {
+                    isEditMode = true;
+                    modalTitle.textContent = 'تعديل بيانات المخالفة';
+                    document.getElementById('violation-id').value = violation.id;
+                    document.getElementById('violation-type').value = violation.violation_type;
+                    document.getElementById('resident-id').value = violation.resident_id;
+                    document.getElementById('violation-description').value = violation.description;
+                    document.getElementById('violation-amount').value = violation.amount;
+                    document.getElementById('violation-status').value = violation.status;
+                    modal.style.display = 'block';
+                } else {
+                    alert('لم يتم العثور على المخالفة.');
+                }
+            } catch (error) {
+                console.error('Error fetching violation for edit:', error);
+                alert('حدث خطأ أثناء جلب بيانات المخالفة للتعديل.');
+            }
+        }
+
+        async function deleteViolation(id) {
+            if (confirm('هل أنت متأكد من حذف هذه المخالفة؟')) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, {
+                        method: 'DELETE',
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        fetchViolations();
+                    } else {
+                        alert('فشل الحذف: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error deleting violation:', error);
+                    alert('حدث خطأ أثناء حذف المخالفة.');
+                }
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('violation-id').value;
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_URL}/${id}` : API_URL;
+
+            const data = {
+                violation_type: document.getElementById('violation-type').value,
+                resident_id: parseInt(document.getElementById('resident-id').value) || null,
+                description: document.getElementById('violation-description').value || null,
+                amount: parseFloat(document.getElementById('violation-amount').value) || 0.0,
+                status: document.getElementById('violation-status').value,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    closeModal();
+                    fetchViolations();
+                } else {
+                    alert('فشل العملية: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving violation:', error);
+                alert('حدث خطأ أثناء حفظ بيانات المخالفة.');
+            }
+        });
+
+        // Export Functions
         function exportData(format) {
-            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
-            // Actual implementation will call /api/export/violations?format=pdf or excel
+            window.location.href = `${API_URL}/export/${format}`;
         }
-
-        function openAddModal() { /* ... */ }
-        function openEditModal(id) { /* ... */ }
-        function deleteViolation(id) { /* ... */ }
-        function closeModal() { /* ... */ }
 
         document.addEventListener('DOMContentLoaded', fetchViolations);
     </script>

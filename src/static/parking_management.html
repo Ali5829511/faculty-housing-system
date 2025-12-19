@@ -6,6 +6,57 @@
     <title>إدارة المواقف - نظام إدارة إسكان أعضاء هيئة التدريس</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* إضافة تنسيق بسيط للمودال */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -26,6 +77,7 @@
         <div class="card">
             <h1><i class="fas fa-parking"></i> إدارة المواقف والملصقات</h1>
             <div class="controls-bar">
+                <button class="btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> إضافة موقف جديد</button>
                 <button class="btn-primary" onclick="exportData('pdf')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
                 <button class="btn-primary" onclick="exportData('excel')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
                 <a href="dashboard.html" class="btn-primary" style="background-color: #6c757d;"><i class="fas fa-arrow-right"></i> العودة للوحة التحكم</a>
@@ -35,11 +87,11 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>الرقم</th>
                             <th>رقم الموقف</th>
-                            <th>المبنى/الفلة</th>
-                            <th>حالة الموقف</th>
-                            <th>رقم الملصق</th>
-                            <th>المركبة</th>
+                            <th>الحالة</th>
+                            <th>رقم الساكن</th>
+                            <th>رقم المبنى</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -51,7 +103,44 @@
         </div>
     </div>
 
+    <!-- Add/Edit Modal -->
+    <div id="addEditModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">إضافة موقف جديد</h2>
+            <form id="parkingForm">
+                <input type="hidden" id="parking-id" name="id">
+                <div class="form-group">
+                    <label for="parking-number">رقم الموقف</label>
+                    <input type="text" id="parking-number" name="parking_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="parking-status">الحالة</label>
+                    <select id="parking-status" name="status" required>
+                        <option value="available">شاغر</option>
+                        <option value="occupied">مشغول</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resident-id">رقم الساكن (اختياري)</label>
+                    <input type="number" id="resident-id" name="resident_id" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="building-id">رقم المبنى (اختياري)</label>
+                    <input type="number" id="building-id" name="building_id" min="1">
+                </div>
+                <button type="submit" class="btn-primary">حفظ</button>
+            </form>
+        </div>
+    </div>
+
     <script>
+        const API_URL = '/api/parking';
+        const modal = document.getElementById('addEditModal');
+        const form = document.getElementById('parkingForm');
+        const modalTitle = document.getElementById('modal-title');
+        let isEditMode = false;
+
         // Basic Authentication Check
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
@@ -65,37 +154,128 @@
             window.location.href = 'login.html';
         }
 
-        // CRUD and Export Functions (Placeholders)
+        // CRUD Functions
         async function fetchParking() {
-            // Placeholder for fetching data from /api/parking
-            const dummyData = [
-                { id: 1, number: 'P-101', building: 'مبنى 1', status: 'مشغول', sticker: 'A001', vehicle: 'تويوتا كامري' },
-                { id: 2, number: 'P-F10', building: 'فلة 10', status: 'شاغر', sticker: 'N/A', vehicle: 'N/A' },
-                { id: 3, number: 'P-205', building: 'مبنى ج', status: 'مشغول', sticker: 'B055', vehicle: 'هوندا أكورد' },
-            ];
-            const tableBody = document.getElementById('parking-table-body');
-            tableBody.innerHTML = '';
-            dummyData.forEach(parking => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${parking.number}</td>
-                    <td>${parking.building}</td>
-                    <td>${parking.status}</td>
-                    <td>${parking.sticker}</td>
-                    <td>${parking.vehicle}</td>
-                    <td>
-                        <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${parking.id})"><i class="fas fa-edit"></i></button>
-                    </td>
-                `;
-            });
+            try {
+                const response = await fetch(API_URL);
+                const parkingSpots = await response.json();
+                const tableBody = document.getElementById('parking-table-body');
+                tableBody.innerHTML = '';
+                parkingSpots.forEach(spot => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${spot.id}</td>
+                        <td>${spot.parking_number}</td>
+                        <td>${spot.status === 'available' ? 'شاغر' : 'مشغول'}</td>
+                        <td>${spot.resident_id || '-'}</td>
+                        <td>${spot.building_id || '-'}</td>
+                        <td>
+                            <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${spot.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteParking(${spot.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching parking spots:', error);
+                alert('حدث خطأ أثناء جلب بيانات المواقف.');
+            }
         }
 
+        function openAddModal() {
+            isEditMode = false;
+            modalTitle.textContent = 'إضافة موقف جديد';
+            form.reset();
+            document.getElementById('parking-id').value = '';
+            modal.style.display = 'block';
+        }
+
+        async function openEditModal(id) {
+            try {
+                const response = await fetch(API_URL);
+                const parkingSpots = await response.json();
+                const spot = parkingSpots.find(s => s.id === id);
+
+                if (spot) {
+                    isEditMode = true;
+                    modalTitle.textContent = 'تعديل بيانات الموقف';
+                    document.getElementById('parking-id').value = spot.id;
+                    document.getElementById('parking-number').value = spot.parking_number;
+                    document.getElementById('parking-status').value = spot.status;
+                    document.getElementById('resident-id').value = spot.resident_id;
+                    document.getElementById('building-id').value = spot.building_id;
+                    modal.style.display = 'block';
+                } else {
+                    alert('لم يتم العثور على الموقف.');
+                }
+            } catch (error) {
+                console.error('Error fetching parking spot for edit:', error);
+                alert('حدث خطأ أثناء جلب بيانات الموقف للتعديل.');
+            }
+        }
+
+        async function deleteParking(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الموقف؟')) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, {
+                        method: 'DELETE',
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        fetchParking();
+                    } else {
+                        alert('فشل الحذف: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error deleting parking spot:', error);
+                    alert('حدث خطأ أثناء حذف الموقف.');
+                }
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('parking-id').value;
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_URL}/${id}` : API_URL;
+
+            const data = {
+                parking_number: document.getElementById('parking-number').value,
+                status: document.getElementById('parking-status').value,
+                resident_id: parseInt(document.getElementById('resident-id').value) || null,
+                building_id: parseInt(document.getElementById('building-id').value) || null,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    closeModal();
+                    fetchParking();
+                } else {
+                    alert('فشل العملية: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving parking spot:', error);
+                alert('حدث خطأ أثناء حفظ بيانات الموقف.');
+            }
+        });
+
+        // Export Functions
         function exportData(format) {
-            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
-            // Actual implementation will call /api/export/parking?format=pdf or excel
+            window.location.href = `${API_URL}/export/${format}`;
         }
-
-        function openEditModal(id) { /* ... */ }
 
         document.addEventListener('DOMContentLoaded', fetchParking);
     </script>

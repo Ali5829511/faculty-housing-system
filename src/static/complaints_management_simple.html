@@ -6,6 +6,57 @@
     <title>إدارة الشكاوى - نظام إدارة إسكان أعضاء هيئة التدريس</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* إضافة تنسيق بسيط للمودال */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -26,6 +77,7 @@
         <div class="card">
             <h1><i class="fas fa-comments"></i> إدارة الشكاوى</h1>
             <div class="controls-bar">
+                <button class="btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> تسجيل شكوى جديدة</button>
                 <button class="btn-primary" onclick="exportData('pdf')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
                 <button class="btn-primary" onclick="exportData('excel')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
                 <a href="dashboard.html" class="btn-primary" style="background-color: #6c757d;"><i class="fas fa-arrow-right"></i> العودة للوحة التحكم</a>
@@ -35,11 +87,13 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>رقم الشكوى</th>
-                            <th>الساكن</th>
-                            <th>نوع الشكوى</th>
-                            <th>التاريخ</th>
+                            <th>الرقم</th>
+                            <th>العنوان</th>
+                            <th>رقم الساكن</th>
+                            <th>الفئة</th>
+                            <th>الأولوية</th>
                             <th>الحالة</th>
+                            <th>تاريخ الإنشاء</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -51,19 +105,62 @@
         </div>
     </div>
 
-    <!-- Add/Edit Modal (Placeholder) -->
+    <!-- Add/Edit Modal -->
     <div id="addEditModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal()">&times;</span>
-            <h2>تفاصيل الشكوى</h2>
+            <h2 id="modal-title">تسجيل/تعديل شكوى</h2>
             <form id="complaintForm">
-                <!-- Form fields here -->
-                <button type="submit" class="btn-primary">تحديث الحالة</button>
+                <input type="hidden" id="complaint-id" name="id">
+                <div class="form-group">
+                    <label for="complaint-title">عنوان الشكوى</label>
+                    <input type="text" id="complaint-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="resident-id">رقم الساكن (اختياري)</label>
+                    <input type="number" id="resident-id" name="resident_id" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="complaint-description">الوصف</label>
+                    <textarea id="complaint-description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="complaint-category">الفئة</label>
+                    <select id="complaint-category" name="category" required>
+                        <option value="صيانة">صيانة</option>
+                        <option value="أمن">أمن</option>
+                        <option value="خدمات">خدمات</option>
+                        <option value="عام">عام</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="complaint-priority">الأولوية</label>
+                    <select id="complaint-priority" name="priority" required>
+                        <option value="low">منخفضة</option>
+                        <option value="medium">متوسطة</option>
+                        <option value="high">عالية</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="complaint-status">الحالة</label>
+                    <select id="complaint-status" name="status" required>
+                        <option value="pending">قيد الانتظار</option>
+                        <option value="in_progress">قيد المعالجة</option>
+                        <option value="resolved">تم الحل</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">حفظ</button>
             </form>
         </div>
     </div>
 
     <script>
+        const API_URL = '/api/complaints';
+        const modal = document.getElementById('addEditModal');
+        const form = document.getElementById('complaintForm');
+        const modalTitle = document.getElementById('modal-title');
+        let isEditMode = false;
+
         // Basic Authentication Check
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
@@ -77,38 +174,134 @@
             window.location.href = 'login.html';
         }
 
-        // CRUD and Export Functions (Placeholders)
+        // CRUD Functions
         async function fetchComplaints() {
-            // Placeholder for fetching data from /api/complaints
-            const dummyData = [
-                { id: 1, resident: 'أحمد محمد', type: 'صيانة عامة', date: '2025-12-10', status: 'قيد المراجعة' },
-                { id: 2, resident: 'سارة علي', type: 'مشكلة موقف', date: '2025-12-12', status: 'تم الحل' },
-                { id: 3, resident: 'خالد فهد', type: 'خدمات', date: '2025-12-15', status: 'مغلقة' },
-            ];
-            const tableBody = document.getElementById('complaints-table-body');
-            tableBody.innerHTML = '';
-            dummyData.forEach(complaint => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${complaint.id}</td>
-                    <td>${complaint.resident}</td>
-                    <td>${complaint.type}</td>
-                    <td>${complaint.date}</td>
-                    <td>${complaint.status}</td>
-                    <td>
-                        <button class="btn-primary" style="background-color: #007bff;" onclick="openEditModal(${complaint.id})"><i class="fas fa-eye"></i> تفاصيل</button>
-                    </td>
-                `;
-            });
+            try {
+                const response = await fetch(API_URL);
+                const complaints = await response.json();
+                const tableBody = document.getElementById('complaints-table-body');
+                tableBody.innerHTML = '';
+                complaints.forEach(complaint => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${complaint.id}</td>
+                        <td>${complaint.title}</td>
+                        <td>${complaint.resident_id || '-'}</td>
+                        <td>${complaint.category}</td>
+                        <td>${complaint.priority}</td>
+                        <td>${complaint.status}</td>
+                        <td>${complaint.created_at.split('T')[0]}</td>
+                        <td>
+                            <button class="btn-primary" style="background-color: #007bff;" onclick="openEditModal(${complaint.id})"><i class="fas fa-eye"></i> تفاصيل</button>
+                            <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteComplaint(${complaint.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching complaints:', error);
+                alert('حدث خطأ أثناء جلب بيانات الشكاوى.');
+            }
         }
 
+        function openAddModal() {
+            isEditMode = false;
+            modalTitle.textContent = 'تسجيل شكوى جديدة';
+            form.reset();
+            document.getElementById('complaint-id').value = '';
+            modal.style.display = 'block';
+        }
+
+        async function openEditModal(id) {
+            try {
+                const response = await fetch(API_URL);
+                const complaints = await response.json();
+                const complaint = complaints.find(c => c.id === id);
+
+                if (complaint) {
+                    isEditMode = true;
+                    modalTitle.textContent = 'تعديل بيانات الشكوى';
+                    document.getElementById('complaint-id').value = complaint.id;
+                    document.getElementById('complaint-title').value = complaint.title;
+                    document.getElementById('resident-id').value = complaint.resident_id;
+                    document.getElementById('complaint-description').value = complaint.description;
+                    document.getElementById('complaint-category').value = complaint.category;
+                    document.getElementById('complaint-priority').value = complaint.priority;
+                    document.getElementById('complaint-status').value = complaint.status;
+                    modal.style.display = 'block';
+                } else {
+                    alert('لم يتم العثور على الشكوى.');
+                }
+            } catch (error) {
+                console.error('Error fetching complaint for edit:', error);
+                alert('حدث خطأ أثناء جلب بيانات الشكوى للتعديل.');
+            }
+        }
+
+        async function deleteComplaint(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الشكوى؟')) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, {
+                        method: 'DELETE',
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        fetchComplaints();
+                    } else {
+                        alert('فشل الحذف: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error deleting complaint:', error);
+                    alert('حدث خطأ أثناء حذف الشكوى.');
+                }
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('complaint-id').value;
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_URL}/${id}` : API_URL;
+
+            const data = {
+                title: document.getElementById('complaint-title').value,
+                resident_id: parseInt(document.getElementById('resident-id').value) || null,
+                description: document.getElementById('complaint-description').value,
+                category: document.getElementById('complaint-category').value,
+                priority: document.getElementById('complaint-priority').value,
+                status: document.getElementById('complaint-status').value,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    closeModal();
+                    fetchComplaints();
+                } else {
+                    alert('فشل العملية: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving complaint:', error);
+                alert('حدث خطأ أثناء حفظ بيانات الشكوى.');
+            }
+        });
+
+        // Export Functions
         function exportData(format) {
-            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
-            // Actual implementation will call /api/export/complaints?format=pdf or excel
+            window.location.href = `${API_URL}/export/${format}`;
         }
-
-        function openEditModal(id) { /* ... */ }
-        function closeModal() { /* ... */ }
 
         document.addEventListener('DOMContentLoaded', fetchComplaints);
     </script>

@@ -6,6 +6,57 @@
     <title>إدارة السكان - نظام إدارة إسكان أعضاء هيئة التدريس</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* إضافة تنسيق بسيط للمودال */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -36,11 +87,12 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>الرقم</th>
                             <th>الاسم</th>
-                            <th>رقم الشقة/الفلة</th>
+                            <th>الهوية الوطنية</th>
+                            <th>الهاتف</th>
+                            <th>رقم الوحدة</th>
                             <th>رقم المبنى</th>
-                            <th>رقم الهوية</th>
-                            <th>رقم الجوال</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -52,19 +104,45 @@
         </div>
     </div>
 
-    <!-- Add/Edit Modal (Placeholder) -->
+    <!-- Add/Edit Modal -->
     <div id="addEditModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal()">&times;</span>
-            <h2>إضافة/تعديل ساكن</h2>
+            <h2 id="modal-title">إضافة ساكن جديد</h2>
             <form id="residentForm">
-                <!-- Form fields here -->
+                <input type="hidden" id="resident-id" name="id">
+                <div class="form-group">
+                    <label for="resident-name">اسم الساكن</label>
+                    <input type="text" id="resident-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="resident-national-id">الهوية الوطنية</label>
+                    <input type="text" id="resident-national-id" name="national_id">
+                </div>
+                <div class="form-group">
+                    <label for="resident-phone">الهاتف</label>
+                    <input type="text" id="resident-phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="resident-unit-number">رقم الوحدة</label>
+                    <input type="text" id="resident-unit-number" name="unit_number">
+                </div>
+                <div class="form-group">
+                    <label for="resident-building-id">رقم المبنى</label>
+                    <input type="number" id="resident-building-id" name="building_id" min="1">
+                </div>
                 <button type="submit" class="btn-primary">حفظ</button>
             </form>
         </div>
     </div>
 
     <script>
+        const API_URL = '/api/residents';
+        const modal = document.getElementById('addEditModal');
+        const form = document.getElementById('residentForm');
+        const modalTitle = document.getElementById('modal-title');
+        let isEditMode = false;
+
         // Basic Authentication Check
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
@@ -78,41 +156,131 @@
             window.location.href = 'login.html';
         }
 
-        // CRUD and Export Functions (Placeholders)
+        // CRUD Functions
         async function fetchResidents() {
-            // Placeholder for fetching data from /api/residents
-            const dummyData = [
-                { id: 1, name: 'أحمد محمد', apartment: '101', building: 'مبنى 1', id_number: '101xxxxxxx', phone: '050xxxxxxx' },
-                { id: 2, name: 'سارة علي', apartment: 'فلة 5', building: 'فلة 5', id_number: '102xxxxxxx', phone: '055xxxxxxx' },
-                { id: 3, name: 'خالد فهد', apartment: '205', building: 'مبنى ج', id_number: '103xxxxxxx', phone: '056xxxxxxx' },
-            ];
-            const tableBody = document.getElementById('residents-table-body');
-            tableBody.innerHTML = '';
-            dummyData.forEach(resident => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${resident.name}</td>
-                    <td>${resident.apartment}</td>
-                    <td>${resident.building}</td>
-                    <td>${resident.id_number}</td>
-                    <td>${resident.phone}</td>
-                    <td>
-                        <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${resident.id})"><i class="fas fa-edit"></i></button>
-                        <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteResident(${resident.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-            });
+            try {
+                const response = await fetch(API_URL);
+                const residents = await response.json();
+                const tableBody = document.getElementById('residents-table-body');
+                tableBody.innerHTML = '';
+                residents.forEach(resident => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${resident.id}</td>
+                        <td>${resident.name}</td>
+                        <td>${resident.national_id || '-'}</td>
+                        <td>${resident.phone || '-'}</td>
+                        <td>${resident.unit_number || '-'}</td>
+                        <td>${resident.building_id || '-'}</td>
+                        <td>
+                            <button class="btn-primary" style="background-color: #28a745;" onclick="openEditModal(${resident.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-primary" style="background-color: #dc3545;" onclick="deleteResident(${resident.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching residents:', error);
+                alert('حدث خطأ أثناء جلب بيانات السكان.');
+            }
         }
 
+        function openAddModal() {
+            isEditMode = false;
+            modalTitle.textContent = 'إضافة ساكن جديد';
+            form.reset();
+            document.getElementById('resident-id').value = '';
+            modal.style.display = 'block';
+        }
+
+        async function openEditModal(id) {
+            try {
+                const response = await fetch(API_URL);
+                const residents = await response.json();
+                const resident = residents.find(r => r.id === id);
+
+                if (resident) {
+                    isEditMode = true;
+                    modalTitle.textContent = 'تعديل بيانات الساكن';
+                    document.getElementById('resident-id').value = resident.id;
+                    document.getElementById('resident-name').value = resident.name;
+                    document.getElementById('resident-national-id').value = resident.national_id;
+                    document.getElementById('resident-phone').value = resident.phone;
+                    document.getElementById('resident-unit-number').value = resident.unit_number;
+                    document.getElementById('resident-building-id').value = resident.building_id;
+                    modal.style.display = 'block';
+                } else {
+                    alert('لم يتم العثور على الساكن.');
+                }
+            } catch (error) {
+                console.error('Error fetching resident for edit:', error);
+                alert('حدث خطأ أثناء جلب بيانات الساكن للتعديل.');
+            }
+        }
+
+        async function deleteResident(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الساكن؟')) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, {
+                        method: 'DELETE',
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        fetchResidents();
+                    } else {
+                        alert('فشل الحذف: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error deleting resident:', error);
+                    alert('حدث خطأ أثناء حذف الساكن.');
+                }
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('resident-id').value;
+            const method = isEditMode ? 'PUT' : 'POST';
+            const url = isEditMode ? `${API_URL}/${id}` : API_URL;
+
+            const data = {
+                name: document.getElementById('resident-name').value,
+                national_id: document.getElementById('resident-national-id').value || null,
+                phone: document.getElementById('resident-phone').value || null,
+                unit_number: document.getElementById('resident-unit-number').value || null,
+                building_id: parseInt(document.getElementById('resident-building-id').value) || null,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    closeModal();
+                    fetchResidents();
+                } else {
+                    alert('فشل العملية: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving resident:', error);
+                alert('حدث خطأ أثناء حفظ بيانات الساكن.');
+            }
+        });
+
+        // Export Functions
         function exportData(format) {
-            alert('وظيفة التصدير ' + format.toUpperCase() + ' قيد التنفيذ.');
-            // Actual implementation will call /api/export/residents?format=pdf or excel
+            window.location.href = `${API_URL}/export/${format}`;
         }
-
-        function openAddModal() { /* ... */ }
-        function openEditModal(id) { /* ... */ }
-        function deleteResident(id) { /* ... */ }
-        function closeModal() { /* ... */ }
 
         document.addEventListener('DOMContentLoaded', fetchResidents);
     </script>
